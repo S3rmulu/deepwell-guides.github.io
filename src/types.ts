@@ -23,6 +23,8 @@ export interface GuideCardItem {
 
 export interface ShipItem {
   name: string;
+  typeId: number;
+  secondaryHulls?: { name: string; typeId: number }[];
   tier: string;
   role: string;
   clone: 'alpha-omega' | 'alpha-expert' | 'omega';
@@ -48,6 +50,7 @@ export interface FittingItem {
   id: string;
   title: string;
   ship: string;
+  typeId: number;
   clone: 'alpha-omega' | 'alpha-expert' | 'omega';
   cloneLabel: string;
   environment: string;

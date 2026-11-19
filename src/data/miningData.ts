@@ -59,9 +59,28 @@ export const PORTAL_GUIDES: GuideCardItem[] = [
   },
 ];
 
+export const SHIP_TYPE_IDS: Record<string, number> = {
+  Venture: 32880,
+  'Venture Consortium Issue': 89648,
+  Pioneer: 89240,
+  Prospect: 33697,
+  Endurance: 37135,
+  Procurer: 17480,
+  Retriever: 17478,
+  Covetor: 17476,
+  Skiff: 22546,
+  Mackinaw: 22548,
+  Hulk: 22544,
+  Porpoise: 42244,
+  Orca: 28606,
+  Rorqual: 28352,
+  Miasmos: 656,
+};
+
 export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Venture',
+    typeId: SHIP_TYPE_IDS.Venture,
     tier: 'Tier 1 · Fragata Minera',
     role: 'Inicio, Gas Huffing & Ninja Mining',
     clone: 'alpha-omega',
@@ -77,6 +96,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Venture Consortium Issue',
+    typeId: SHIP_TYPE_IDS['Venture Consortium Issue'],
     tier: 'Tier 1 · Fragata de Facción',
     role: 'Extracción Rápida & Movilidad',
     clone: 'alpha-omega',
@@ -91,6 +111,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Pioneer',
+    typeId: SHIP_TYPE_IDS.Pioneer,
     tier: 'Tier 1.5 · Destructor Minero',
     role: 'Puente Intermedio de Extracción',
     clone: 'alpha-omega',
@@ -105,6 +126,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Prospect',
+    typeId: SHIP_TYPE_IDS.Prospect,
     tier: 'Tier 2 · Fragata de Expedición T2',
     role: 'Operaciones Encubiertas & Gas de Alto Riesgo',
     clone: 'omega',
@@ -120,6 +142,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Endurance',
+    typeId: SHIP_TYPE_IDS.Endurance,
     tier: 'Tier 2 · Fragata de Expedición T2',
     role: 'Cosecha de Hielo Táctica',
     clone: 'omega',
@@ -134,6 +157,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Procurer',
+    typeId: SHIP_TYPE_IDS.Procurer,
     tier: 'Tier 3 · Mining Barge',
     role: 'Tanqueo Extremo & Supervivencia Null-Sec',
     clone: 'alpha-expert',
@@ -148,6 +172,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Retriever',
+    typeId: SHIP_TYPE_IDS.Retriever,
     tier: 'Tier 3 · Mining Barge',
     role: 'Almacenamiento Masivo en Solitario',
     clone: 'alpha-expert',
@@ -162,6 +187,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Covetor',
+    typeId: SHIP_TYPE_IDS.Covetor,
     tier: 'Tier 3 · Mining Barge',
     role: 'Máximo Rendimiento en Flota',
     clone: 'alpha-expert',
@@ -176,6 +202,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Skiff',
+    typeId: SHIP_TYPE_IDS.Skiff,
     tier: 'Tier 4 · Exhumer Tech II',
     role: 'Fortaleza de Extracción Null-Sec',
     clone: 'omega',
@@ -190,6 +217,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Mackinaw',
+    typeId: SHIP_TYPE_IDS.Mackinaw,
     tier: 'Tier 4 · Exhumer Tech II',
     role: 'Resistencia Autárquica & Bodega Gigante',
     clone: 'omega',
@@ -204,6 +232,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Hulk',
+    typeId: SHIP_TYPE_IDS.Hulk,
     tier: 'Tier 4 · Exhumer Tech II',
     role: 'Élite de Extracción Industrial',
     clone: 'omega',
@@ -218,6 +247,12 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Porpoise / Orca / Rorqual',
+    typeId: SHIP_TYPE_IDS.Orca,
+    secondaryHulls: [
+      { name: 'Porpoise', typeId: SHIP_TYPE_IDS.Porpoise },
+      { name: 'Orca', typeId: SHIP_TYPE_IDS.Orca },
+      { name: 'Rorqual', typeId: SHIP_TYPE_IDS.Rorqual },
+    ],
     tier: 'Tier 5 · Mando Industrial & Capital',
     role: 'Boosts de Flota, Compresión & PANIC',
     clone: 'omega',
@@ -233,6 +268,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
   },
   {
     name: 'Miasmos',
+    typeId: SHIP_TYPE_IDS.Miasmos,
     tier: 'Logística · Carguero Industrial Gallente',
     role: 'Transporte Masivo de Mineral Crudo',
     clone: 'alpha-omega',
@@ -339,6 +375,7 @@ export const FITTINGS_LIST: FittingItem[] = [
     id: 'venture-alpha-ore',
     title: 'Venture Minería Estándar (Meta 3 / T2)',
     ship: 'Venture',
+    typeId: SHIP_TYPE_IDS.Venture,
     clone: 'alpha-omega',
     cloneLabel: 'ALPHA & OMEGA',
     environment: 'Null-Sec / Low-Sec / High-Sec',
@@ -365,6 +402,7 @@ Hobgoblin I x2`,
     id: 'venture-alpha-gas',
     title: 'Venture Ninja Gas Huffing (Wormholes & Null)',
     ship: 'Venture',
+    typeId: SHIP_TYPE_IDS.Venture,
     clone: 'alpha-omega',
     cloneLabel: 'ALPHA & OMEGA',
     environment: 'Wormholes (J-Space) & Null-Sec',
@@ -393,6 +431,7 @@ Core Scanner Probe I x8`,
     id: 'procurer-null-tank',
     title: 'Procurer Tanque Null-Sec (Barcaza T1)',
     ship: 'Procurer',
+    typeId: SHIP_TYPE_IDS.Procurer,
     clone: 'alpha-expert',
     cloneLabel: 'OMEGA (o ALPHA + Expert System)',
     environment: 'Null-Sec Soberanía / Lunas',
@@ -423,6 +462,7 @@ Hornet EC-300 x5`,
     id: 'procurer-expert-t1',
     title: 'Procurer T1 Lista para Expert System (Sin Residuo)',
     ship: 'Procurer',
+    typeId: SHIP_TYPE_IDS.Procurer,
     clone: 'alpha-expert',
     cloneLabel: 'ALPHA + EXPERT SYSTEM / OMEGA',
     environment: 'Null-Sec / Lunas R32–R64 / Hielo T1',
@@ -453,6 +493,7 @@ Hornet EC-300 x5`,
     id: 'skiff-null-elite',
     title: 'Skiff Élite Null-Sec (Exhumer T2)',
     ship: 'Skiff',
+    typeId: SHIP_TYPE_IDS.Skiff,
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
     environment: 'Null-Sec Caliente / Anomalías Raras',

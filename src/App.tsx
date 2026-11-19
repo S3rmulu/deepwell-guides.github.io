@@ -21,7 +21,7 @@ import {
   Keyboard,
   Clock,
 } from 'lucide-react';
-import { CloneFilter, GuideModuleId } from './types';
+import { CloneFilter, GuideModuleId, ShipItem } from './types';
 import {
   PORTAL_GUIDES,
   SHIPS_CATALOG,
@@ -32,6 +32,103 @@ import {
   ACTIVITY_COMPARISON_MATRIX,
   MINING_SHORTCUTS,
 } from './data/miningData';
+
+function getCloneBadgeClasses(clone: 'alpha-omega' | 'alpha-expert' | 'omega'): string {
+  if (clone === 'alpha-omega') {
+    return 'bg-zinc-900 text-zinc-200 border-zinc-700';
+  }
+  if (clone === 'alpha-expert') {
+    return 'bg-amber-500/10 text-amber-300 border-amber-500/35';
+  }
+  return 'bg-amber-500/15 text-amber-400 border-amber-500/40';
+}
+
+interface ShipHullPreviewProps {
+  typeId: number;
+  name: string;
+  size?: 'lg' | 'md';
+  secondaryHulls?: ShipItem['secondaryHulls'];
+}
+
+function ShipHullPreview({ typeId, name, size = 'lg', secondaryHulls }: ShipHullPreviewProps) {
+  const hulls = secondaryHulls && secondaryHulls.length > 0 ? secondaryHulls : [{ name, typeId }];
+  const defaultIndex = Math.max(
+    0,
+    hulls.findIndex((h) => h.typeId === typeId)
+  );
+  const [selectedIndex, setSelectedIndex] = useState(defaultIndex);
+  const [imageStage, setImageStage] = useState<'render' | 'icon' | 'fallback'>('render');
+
+  const activeHull = hulls[selectedIndex] ?? hulls[0];
+  const imgUrl =
+    imageStage === 'render'
+      ? `https://images.evetech.net/types/${activeHull.typeId}/render?size=256`
+      : `https://images.evetech.net/types/${activeHull.typeId}/icon?size=128`;
+
+  const boxSize = size === 'lg' ? 'w-20 h-20 sm:w-24 sm:h-24' : 'w-14 h-14';
+
+  const handleSelectHull = (idx: number) => {
+    if (idx === selectedIndex) return;
+    setSelectedIndex(idx);
+    setImageStage('render');
+  };
+
+  const handleImageError = () => {
+    setImageStage((prev) => (prev === 'render' ? 'icon' : 'fallback'));
+  };
+
+  return (
+    <div className="flex flex-col items-start gap-1.5 shrink-0">
+      <div
+        className={`relative ${boxSize} aspect-square rounded-lg border border-zinc-800/90 bg-[#070709] overflow-hidden flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.10)_0%,rgba(9,9,11,0)_72%)] pointer-events-none"
+        />
+        {imageStage === 'fallback' ? (
+          <Rocket className="w-6 h-6 text-zinc-600 relative z-10" aria-hidden="true" />
+        ) : (
+          <img
+            src={imgUrl}
+            alt={`${activeHull.name} - Render oficial EVE Online`}
+            loading="lazy"
+            decoding="async"
+            onError={handleImageError}
+            className={`relative z-10 w-full h-full object-contain ${
+              size === 'lg' ? 'p-1' : 'p-0.5'
+            } transition-transform duration-300 group-hover:scale-105`}
+          />
+        )}
+      </div>
+
+      {size === 'lg' && (
+        <span className="text-[10px] font-mono tabular-nums text-zinc-500 tracking-tight">
+          HULL // {activeHull.typeId}
+        </span>
+      )}
+
+      {hulls.length > 1 && (
+        <div className="flex flex-wrap gap-1" role="group" aria-label="Seleccionar casco">
+          {hulls.map((hull, idx) => (
+            <button
+              key={hull.typeId}
+              type="button"
+              onClick={() => handleSelectHull(idx)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider border transition-colors ${
+                idx === selectedIndex
+                  ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+              }`}
+            >
+              {hull.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function App() {
   const [activeView, setActiveView] = useState<'hub' | 'guide'>('guide');
@@ -819,57 +916,113 @@ export function App() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {filteredShips.map((ship) => (
-                          <div
-                            key={ship.name}
-                            className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 flex flex-col justify-between space-y-4 hover:border-zinc-700 transition-colors"
-                          >
-                            <div className="space-y-2.5">
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <span className="text-[11px] font-mono text-zinc-400">
-                                    {ship.tier}
-                                  </span>
-                                  <h3 className="text-lg font-bold text-zinc-100">{ship.name}</h3>
+                      {filteredShips.length === 0 ? (
+                        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center space-y-2">
+                          <p className="text-sm font-semibold text-zinc-200">
+                            Ninguna nave coincide con los filtros actuales.
+                          </p>
+                          <p className="text-xs text-zinc-400">
+                            Ajusta el Tier o el filtro de Clon para volver a ver el catálogo completo.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {filteredShips.map((ship) => {
+                            const hasFittings = FITTINGS_LIST.some((f) => f.ship === ship.name);
+                            return (
+                              <div
+                                key={ship.name}
+                                className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 flex flex-col justify-between gap-4 hover:border-zinc-700 transition-colors"
+                              >
+                                <div className="space-y-3.5">
+                                  <div className="flex items-start gap-4">
+                                    <ShipHullPreview
+                                      typeId={ship.typeId}
+                                      name={ship.name}
+                                      size="lg"
+                                      secondaryHulls={ship.secondaryHulls}
+                                    />
+
+                                    <div className="min-w-0 flex-1 space-y-2">
+                                      <div className="flex flex-wrap items-start justify-between gap-2">
+                                        <div className="min-w-0">
+                                          <h3 className="text-lg font-bold text-zinc-100 leading-tight">
+                                            {ship.name}
+                                          </h3>
+                                          <p className="text-[11px] font-mono text-zinc-400 mt-0.5">
+                                            {ship.tier}
+                                          </p>
+                                        </div>
+                                        <span
+                                          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border shrink-0 ${getCloneBadgeClasses(
+                                            ship.clone
+                                          )}`}
+                                        >
+                                          {ship.cloneLabel}
+                                        </span>
+                                      </div>
+
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                                        <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-2.5 py-2">
+                                          <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
+                                            Rol táctico
+                                          </div>
+                                          <div className="text-xs font-medium text-zinc-200 mt-0.5 leading-snug">
+                                            {ship.role}
+                                          </div>
+                                        </div>
+                                        <div className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-2.5 py-2">
+                                          <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
+                                            Capacidad de bodega
+                                          </div>
+                                          <div className="text-xs font-mono tabular-nums font-medium text-amber-400 mt-0.5 leading-snug">
+                                            {ship.cargo}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <ul className="space-y-1.5 text-xs text-zinc-300 pt-1">
+                                    {ship.bonuses.map((b, idx) => (
+                                      <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                                        <span
+                                          aria-hidden="true"
+                                          className="w-1.5 h-1.5 rounded-full bg-amber-400/80 mt-1.5 shrink-0"
+                                        />
+                                        <span>{b}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
-                                <span
-                                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border shrink-0 ${
-                                    ship.clone === 'alpha-omega'
-                                      ? 'bg-zinc-800 text-zinc-200 border-zinc-700'
-                                      : ship.clone === 'alpha-expert'
-                                      ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
-                                      : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-                                  }`}
-                                >
-                                  {ship.cloneLabel}
-                                </span>
+
+                                <div className="pt-3 border-t border-zinc-800/80 space-y-1.5 text-[11px]">
+                                  <p className="text-zinc-400">
+                                    <strong className="text-zinc-200">Requisitos:</strong>{' '}
+                                    {ship.requirements}
+                                  </p>
+                                  <p className="text-zinc-400">
+                                    <strong className="text-amber-400">Doctrina Null-Sec:</strong>{' '}
+                                    {ship.nullsecNote}
+                                  </p>
+                                  {hasFittings && (
+                                    <div className="pt-1">
+                                      <button
+                                        type="button"
+                                        onClick={() => setActiveModule('fittings')}
+                                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                                      >
+                                        Ver fittings EFT
+                                        <ChevronRight className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-
-                              <div className="text-xs text-amber-400 font-medium">
-                                Rol: {ship.role} · Bodega: {ship.cargo}
-                              </div>
-
-                              <ul className="space-y-1 text-xs text-zinc-300 pt-1">
-                                {ship.bonuses.map((b, idx) => (
-                                  <li key={idx}>• {b}</li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            <div className="pt-3 border-t border-zinc-800/80 space-y-1 text-[11px]">
-                              <p className="text-zinc-400">
-                                <strong className="text-zinc-200">Requisitos:</strong>{' '}
-                                {ship.requirements}
-                              </p>
-                              <p className="text-zinc-400">
-                                <strong className="text-amber-400">Nota Null-Sec:</strong>{' '}
-                                {ship.nullsecNote}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1198,51 +1351,108 @@ export function App() {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {filteredFittings.map((fit) => (
-                        <div
-                          key={fit.id}
-                          className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 flex flex-col justify-between space-y-4"
-                        >
-                          <div className="space-y-2.5">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <h3 className="text-sm font-bold text-zinc-100">{fit.title}</h3>
-                                <p className="text-[11px] text-amber-400">
-                                  {fit.environment} · Coste est.: {fit.estimatedCost}
-                                </p>
+                    {filteredFittings.length === 0 ? (
+                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center space-y-2">
+                        <p className="text-sm font-semibold text-zinc-200">
+                          Ningún fitting coincide con los filtros actuales.
+                        </p>
+                        <p className="text-xs text-zinc-400">
+                          Cambia el filtro de Clon o limpia el buscador para ver todas las configuraciones EFT.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {filteredFittings.map((fit) => (
+                          <div
+                            key={fit.id}
+                            className="group rounded-xl border border-zinc-800 bg-zinc-950 p-5 flex flex-col justify-between gap-4 hover:border-zinc-700 transition-colors"
+                          >
+                            <div className="space-y-3">
+                              <div className="flex items-start gap-3.5">
+                                <ShipHullPreview typeId={fit.typeId} name={fit.ship} size="md" />
+
+                                <div className="min-w-0 flex-1 space-y-2">
+                                  <div className="flex flex-wrap items-start justify-between gap-2">
+                                    <div className="min-w-0">
+                                      <h3 className="text-sm font-bold text-zinc-100 leading-snug">
+                                        {fit.title}
+                                      </h3>
+                                      <p className="text-[11px] font-mono tabular-nums text-zinc-400 mt-0.5">
+                                        {fit.ship} · HULL // {fit.typeId}
+                                      </p>
+                                    </div>
+                                    <span
+                                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border shrink-0 ${getCloneBadgeClasses(
+                                        fit.clone
+                                      )}`}
+                                    >
+                                      {fit.cloneLabel}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-zinc-800 bg-zinc-900/70 text-[11px] text-zinc-300">
+                                      {fit.environment}
+                                    </span>
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-amber-500/30 bg-amber-500/10 text-[11px] font-mono tabular-nums font-semibold text-amber-400">
+                                      Est. {fit.estimatedCost}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300 shrink-0">
-                                {fit.cloneLabel}
-                              </span>
+
+                              <p className="text-xs text-zinc-400 leading-relaxed">{fit.notes}</p>
+
+                              <div className="rounded-lg border border-zinc-800/90 bg-[#070709] overflow-hidden">
+                                <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800/80 bg-zinc-900/50">
+                                  <span className="text-[10px] font-mono text-zinc-400 tracking-wide">
+                                    [EFT // {fit.ship.toUpperCase()}]
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyEft(fit.id, fit.eft)}
+                                    className="inline-flex items-center gap-1 text-[10px] font-mono text-zinc-400 hover:text-amber-300 transition-colors"
+                                  >
+                                    {copiedId === fit.id ? (
+                                      <>
+                                        <Check className="w-3 h-3 text-amber-400" />
+                                        <span className="text-amber-400">Copiado</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Copy className="w-3 h-3" />
+                                        <span>Copiar</span>
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                                <pre className="p-3 text-[11px] font-mono text-zinc-300 overflow-x-auto leading-relaxed">
+                                  {fit.eft}
+                                </pre>
+                              </div>
                             </div>
 
-                            <p className="text-xs text-zinc-400 leading-relaxed">{fit.notes}</p>
-
-                            <pre className="p-3 rounded-lg bg-[#09090b] border border-zinc-800/90 text-[11px] font-mono text-zinc-300 overflow-x-auto leading-relaxed">
-                              {fit.eft}
-                            </pre>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyEft(fit.id, fit.eft)}
+                              className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-amber-500 text-zinc-200 hover:text-zinc-950 border border-zinc-700 hover:border-amber-500 text-xs font-bold transition-all flex items-center justify-center gap-2"
+                            >
+                              {copiedId === fit.id ? (
+                                <>
+                                  <Check className="w-4 h-4" />
+                                  ¡Copiado al portapapeles!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-4 h-4" />
+                                  Copiar Fitting EFT
+                                </>
+                              )}
+                            </button>
                           </div>
-
-                          <button
-                            onClick={() => handleCopyEft(fit.id, fit.eft)}
-                            className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-amber-500 text-zinc-200 hover:text-zinc-950 border border-zinc-700 hover:border-amber-500 text-xs font-bold transition-all flex items-center justify-center gap-2"
-                          >
-                            {copiedId === fit.id ? (
-                              <>
-                                <Check className="w-4 h-4" />
-                                ¡Copiado al portapapeles!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4" />
-                                Copiar Fitting EFT
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </section>
