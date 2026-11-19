@@ -17,7 +17,9 @@ import {
   ArrowLeft,
   Info,
   Zap,
-  Package,
+  Coins,
+  Keyboard,
+  Clock,
 } from 'lucide-react';
 import { CloneFilter, GuideModuleId } from './types';
 import {
@@ -25,6 +27,10 @@ import {
   SHIPS_CATALOG,
   SKILLS_BIBLE,
   FITTINGS_LIST,
+  PLEX_MARKET_BASE,
+  EXPERT_SYSTEMS_CATALOG,
+  ACTIVITY_COMPARISON_MATRIX,
+  MINING_SHORTCUTS,
 } from './data/miningData';
 
 export function App() {
@@ -45,16 +51,19 @@ export function App() {
   const matchesClone = (itemClone: 'alpha-omega' | 'alpha-expert' | 'omega') => {
     if (cloneFilter === 'all') return true;
     if (cloneFilter === 'alpha') {
+      return itemClone === 'alpha-omega';
+    }
+    if (cloneFilter === 'expert') {
       return itemClone === 'alpha-omega' || itemClone === 'alpha-expert';
     }
-    return itemClone === 'omega' || itemClone === 'alpha-omega' || itemClone === 'alpha-expert';
+    return true;
   };
 
   const filteredGuides = useMemo(() => {
     return PORTAL_GUIDES.filter((g) => {
       const cloneOk =
         cloneFilter === 'all' ||
-        (cloneFilter === 'alpha' && g.cloneAccess === 'alpha-omega') ||
+        ((cloneFilter === 'alpha' || cloneFilter === 'expert') && g.cloneAccess === 'alpha-omega') ||
         cloneFilter === 'omega';
       const queryOk =
         !searchQuery.trim() ||
@@ -164,14 +173,15 @@ export function App() {
               {(
                 [
                   { id: 'all', label: 'Todos' },
-                  { id: 'alpha', label: 'Solo Alpha' },
+                  { id: 'alpha', label: 'Alpha' },
+                  { id: 'expert', label: 'Alpha + Expert' },
                   { id: 'omega', label: 'Omega' },
                 ] as { id: CloneFilter; label: string }[]
               ).map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setCloneFilter(tab.id)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${
                     cloneFilter === tab.id
                       ? 'bg-amber-500 text-zinc-950 shadow-sm'
                       : 'text-zinc-400 hover:text-zinc-100'
@@ -212,7 +222,11 @@ export function App() {
               <span>
                 Filtro activo:{' '}
                 <strong className="text-amber-300 uppercase">
-                  {cloneFilter === 'alpha' ? 'Clon Alpha (Gratis + Expert Systems)' : 'Clon Omega (Acceso Total)'}
+                  {cloneFilter === 'alpha'
+                    ? 'Clon Alpha (Gratuito · 0 ISK / 0 PLEX)'
+                    : cloneFilter === 'expert'
+                    ? 'Alpha con Expert System (Acceso temporal 7 días)'
+                    : 'Clon Omega (Suscripción / 500 PLEX)'}
                 </strong>{' '}
                 — Mostrando {filteredShips.length} naves, {filteredSkills.length} skills y{' '}
                 {filteredFittings.length} fittings compatibles.
@@ -365,86 +379,153 @@ export function App() {
                 {/* MÓDULO 0: VISIÓN GENERAL & CLONES */}
                 {activeModule === 'overview' && (
                   <div className="space-y-6">
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4">
-                      <h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
-                        <Layers className="w-5 h-5 text-amber-400" />
-                        Sección General: Estados de Clon y Hoja de Ruta
-                      </h2>
-                      <p className="text-sm text-zinc-300 leading-relaxed">
-                        La minería en EVE Online es una profesión escalable que abarca desde la
-                        extracción sigilosa en fragatas hasta flotas capitales bajo paraguas de
-                        soberanía en Null-Sec. Antes de invertir Skill Points o ISK, comprende las
-                        diferencias reales entre clones <strong>Alpha</strong> y{' '}
-                        <strong>Omega</strong>.
-                      </p>
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-5">
+                      <div className="space-y-2">
+                        <h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
+                          <Layers className="w-5 h-5 text-amber-400" />
+                          Sección General: Alpha, Alpha + Expert System y Omega
+                        </h2>
+                        <p className="text-sm text-zinc-300 leading-relaxed">
+                          La minería en EVE Online se divide en tres escalones reales de acceso:
+                          cuenta gratuita <strong>Alpha</strong>, cuentas <strong>Alpha con Expert System</strong>{' '}
+                          (alquiler temporal de habilidades por 7 días para desbloquear actividades concretas)
+                          y suscripción completa <strong>Omega</strong>.
+                        </p>
+                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        {/* Tarjeta Alpha */}
+                      {/* 3 Tarjetas de Escalones */}
+                      <div
+                        className={`grid grid-cols-1 ${
+                          cloneFilter === 'all' ? 'lg:grid-cols-3' : ''
+                        } gap-4 pt-1`}
+                      >
+                        {/* Tarjeta 1: Alpha */}
                         {(cloneFilter === 'all' || cloneFilter === 'alpha') && (
-                          <div className="rounded-xl border border-zinc-700 bg-zinc-950 p-5 space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-zinc-800 text-zinc-200 border border-zinc-700">
-                                CLON ALPHA (GRATUITO)
-                              </span>
-                              <span className="text-xs text-zinc-400">Límite 5M / 20.5M SP</span>
+                          <div className="rounded-xl border border-zinc-700 bg-zinc-950 p-5 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-zinc-800 text-zinc-200 border border-zinc-700">
+                                  1. ALPHA (GRATUITO)
+                                </span>
+                                <span className="text-[11px] font-mono text-zinc-400">5M / 20.5M SP</span>
+                              </div>
+                              <div className="rounded-lg bg-zinc-900/90 border border-zinc-800 px-3 py-2 text-[11px] flex items-center justify-between">
+                                <span className="text-zinc-400">Coste base:</span>
+                                <span className="font-mono font-bold text-zinc-200">
+                                  {PLEX_MARKET_BASE.alphaCost}
+                                </span>
+                              </div>
+                              <ul className="space-y-2 text-xs text-zinc-300 leading-relaxed">
+                                <li>
+                                  • <strong>Entrenamiento:</strong> Velocidad 1x hasta 5M SP; hasta
+                                  ~20.5M SP con Daily Alpha Injectors o recompensas AIR.
+                                </li>
+                                <li>
+                                  • <strong>Naves disponibles:</strong> Venture, Venture Consortium Issue,
+                                  Pioneer y carguero Miasmos (hasta 63,000 m³ de bodega).
+                                </li>
+                                <li>
+                                  • <strong>Mina de oro Alpha:</strong> Gas Huffing en Wormholes o
+                                  Null-Sec (20M–50M ISK/h con 2x Gas Cloud Scoop).
+                                </li>
+                                <li>
+                                  • <strong>Límites:</strong> Sin Barcazas, sin Hielo ni Mercoxit,
+                                  +2% impuesto industrial y prohibición de multiboxing.
+                                </li>
+                              </ul>
                             </div>
-                            <ul className="space-y-2 text-xs text-zinc-300 leading-relaxed">
-                              <li>
-                                • <strong>Entrenamiento:</strong> Velocidad 1x hasta 5M SP; hasta
-                                ~20.5M SP mediante Daily Alpha Injectors o recompensas AIR.
-                              </li>
-                              <li>
-                                • <strong>Naves base:</strong> Venture, Venture Consortium Issue,
-                                Pioneer y carguero Miasmos (hasta 63,000 m³ de bodega de mineral).
-                              </li>
-                              <li>
-                                • <strong>Excepción Barcazas T1:</strong> Puedes volar{' '}
-                                <span className="text-amber-300 font-semibold">
-                                  Procurer, Retriever y Covetor
-                                </span>{' '}
-                                activando un <em>Mining Barge Expert System</em> (comprado con PLEX
-                                o ISK en el mercado por 7 días).
-                              </li>
-                              <li>
-                                • <strong>Mina de oro Alpha:</strong> Gas Huffing en Wormholes o
-                                Null-Sec (20M–70M ISK/h).
-                              </li>
-                              <li>
-                                • <strong>Restricciones:</strong> +2% impuesto adicional en
-                                industria/ciencia y prohibición estricta de multiboxing.
-                              </li>
-                            </ul>
                           </div>
                         )}
 
-                        {/* Tarjeta Omega */}
-                        {(cloneFilter === 'all' || cloneFilter === 'omega') && (
-                          <div className="rounded-xl border border-amber-500/40 bg-zinc-950 p-5 space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                                CLON OMEGA (SUSCRIPCIÓN / PLEX)
-                              </span>
-                              <span className="text-xs text-amber-400">Velocidad 2x · Sin tope</span>
+                        {/* Tarjeta 2: Alpha + Expert System */}
+                        {(cloneFilter === 'all' || cloneFilter === 'expert') && (
+                          <div className="rounded-xl border border-sky-500/40 bg-zinc-950 p-5 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/40">
+                                  2. ALPHA + EXPERT SYSTEM
+                                </span>
+                                <span className="text-[11px] font-mono text-sky-300 flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />7 días
+                                </span>
+                              </div>
+                              <div className="rounded-lg bg-sky-500/10 border border-sky-500/25 px-3 py-2 text-[11px] space-y-0.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sky-200/80">Ref. PLEX:</span>
+                                  <span className="font-mono font-bold text-sky-300">
+                                    {PLEX_MARKET_BASE.expertCostPlex}
+                                  </span>
+                                </div>
+                                <div className="text-[10px] text-zinc-400 font-mono">
+                                  {PLEX_MARKET_BASE.expertCostIsk}
+                                </div>
+                              </div>
+                              <ul className="space-y-2 text-xs text-zinc-300 leading-relaxed">
+                                <li>
+                                  • <strong>Puente sin pagar Omega:</strong> Alquila habilidades específicas
+                                  durante 7 días (no se pierden si te destruyen la cápsula).
+                                </li>
+                                <li>
+                                  • <strong>Mining Barge Operations:</strong> Desbloquea{' '}
+                                  <span className="text-sky-300 font-semibold">
+                                    Procurer, Retriever y Covetor
+                                  </span>{' '}
+                                  con <em>Strip Miner I</em> e incluso <em>Ice Harvester I</em>.
+                                </li>
+                                <li>
+                                  • <strong>Gas Harvesting System:</strong> Sube temporalmente a{' '}
+                                  <em>Gas Cloud Harvesting V</em> para maximizar extracción de gas.
+                                </li>
+                                <li>
+                                  • <strong>Límite clave:</strong> Sigue sujeto a módulos Tech I en
+                                  skills Omega, sin Exhumers T2 ni Mercoxit.
+                                </li>
+                              </ul>
                             </div>
-                            <ul className="space-y-2 text-xs text-zinc-300 leading-relaxed">
-                              <li>
-                                • <strong>Acceso irrestricto:</strong> Todas las Barcazas, Exhumers
-                                T2 (Skiff, Mackinaw, Hulk), Fragatas de Expedición (Prospect,
-                                Endurance) y Mando (Porpoise, Orca, Rorqual).
-                              </li>
-                              <li>
-                                • <strong>Recursos exclusivos:</strong> Minería de Hielo, Mercoxit
-                                (Deep Core) y Lunas R32/R64 con cristales especializados.
-                              </li>
-                              <li>
-                                • <strong>Sin recargo fiscal:</strong> Evita el +2% de impuesto
-                                Alpha en trabajos industriales y reacciones.
-                              </li>
-                              <li>
-                                • <strong>Multiboxing legal:</strong> Permite operar múltiples
-                                cuentas Omega simultáneamente (ej. Hulk + Porpoise).
-                              </li>
-                            </ul>
+                          </div>
+                        )}
+
+                        {/* Tarjeta 3: Omega */}
+                        {(cloneFilter === 'all' || cloneFilter === 'omega') && (
+                          <div className="rounded-xl border border-amber-500/40 bg-zinc-950 p-5 space-y-3 flex flex-col justify-between">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                  3. OMEGA (SUSCRIPCIÓN)
+                                </span>
+                                <span className="text-[11px] font-mono text-amber-400">2x SP · Sin tope</span>
+                              </div>
+                              <div className="rounded-lg bg-amber-500/10 border border-amber-500/25 px-3 py-2 text-[11px] space-y-0.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-amber-200/80">Coste base:</span>
+                                  <span className="font-mono font-bold text-amber-300">
+                                    {PLEX_MARKET_BASE.omegaCostPlex}
+                                  </span>
+                                </div>
+                                <div className="text-[10px] text-zinc-400 font-mono">
+                                  {PLEX_MARKET_BASE.omegaCostIsk}
+                                </div>
+                              </div>
+                              <ul className="space-y-2 text-xs text-zinc-300 leading-relaxed">
+                                <li>
+                                  • <strong>Acceso irrestricto:</strong> Exhumers T2 (Skiff, Mackinaw,
+                                  Hulk), Fragatas T2 (Prospect, Endurance) y Mando (Porpoise, Orca,
+                                  Rorqual).
+                                </li>
+                                <li>
+                                  • <strong>Actividades exclusivas:</strong> Mercoxit (Deep Core),
+                                  Hielo con Ice Harvester II y Lunas R32/R64 con cristales T2.
+                                </li>
+                                <li>
+                                  • <strong>Sin recargo fiscal:</strong> Evita el +2% de impuesto
+                                  Alpha en industria y reacciones.
+                                </li>
+                                <li>
+                                  • <strong>Multiboxing legal:</strong> Permite operar varias
+                                  cuentas Omega a la vez (ej. Hulk + Porpoise comprimiendo).
+                                </li>
+                              </ul>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -454,19 +535,180 @@ export function App() {
                         <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                         <div className="text-xs text-zinc-200 space-y-1">
                           <p className="font-bold text-amber-300">
-                            Advertencia Técnica: La Trampa de Ice Harvesting en Alpha
+                            Advertencia Técnica: La Trampa de Ice Harvesting en Alpha Puro
                           </p>
                           <p className="text-zinc-300">
                             Aunque el cliente permite a un clon Alpha entrenar{' '}
                             <em>Ice Harvesting</em> hasta nivel II,{' '}
                             <strong>
-                              no existe ninguna nave accesible para Alpha capaz de equipar módulos
-                              Ice Harvester
+                              ninguna nave de Alpha puro puede equipar módulos Ice Harvester
                             </strong>{' '}
-                            (solo se montan en Barcazas, Exhumers o Endurance). No inviertas SP ahí
-                            si no vas a activar Omega o un Expert System.
+                            (solo se montan en Barcazas, Exhumers o Endurance). No gastes SP en ello
+                            salvo que actives un <strong>Mining Barge Operations Expert System</strong>{' '}
+                            (que habilita Barcazas T1 + <em>Ice Harvester I</em>) o pases a Omega.
                           </p>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* BLOQUE 2: BASE DE PRECIOS PLEX / ISK & EXPERT SYSTEMS POR ACTIVIDAD */}
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <h3 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
+                            <Coins className="w-5 h-5 text-sky-400" />
+                            Expert Systems por Actividad & Base PLEX / ISK
+                          </h3>
+                          <p className="text-xs text-zinc-400">
+                            Referencia de mercado en Jita para calcular retorno antes de activar un
+                            Expert System o pagar Omega.
+                          </p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs font-mono text-zinc-300 shrink-0">
+                          Base ref.: <strong className="text-amber-400">1 PLEX ≈ {PLEX_MARKET_BASE.plexUnitIsk}</strong>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {EXPERT_SYSTEMS_CATALOG.map((exp) => (
+                          <div
+                            key={exp.id}
+                            className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 flex flex-col justify-between space-y-3 hover:border-sky-500/40 transition-colors"
+                          >
+                            <div className="space-y-2.5">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                                  {exp.duration}
+                                </span>
+                                <span className="text-[10px] font-mono text-zinc-400">
+                                  {exp.plexEstimate}
+                                </span>
+                              </div>
+                              <h4 className="text-sm font-bold text-zinc-100">{exp.name}</h4>
+                              <p className="text-xs text-amber-400 font-medium">{exp.activity}</p>
+                              <div className="rounded-lg bg-zinc-900/80 border border-zinc-800 p-2 text-[11px] font-mono text-zinc-300">
+                                {exp.iskEstimate}
+                              </div>
+                              <div className="space-y-1 text-[11px] text-zinc-400">
+                                <p>
+                                  <strong className="text-zinc-200">Naves:</strong>{' '}
+                                  {exp.shipsUnlocked.join(', ')}
+                                </p>
+                                <p>
+                                  <strong className="text-zinc-200">Skills clave:</strong>{' '}
+                                  {exp.skillsGranted.join(' · ')}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="pt-2 border-t border-zinc-800/80 text-[11px] text-zinc-400 leading-relaxed">
+                              <strong className="text-sky-300">ROI estimado:</strong> {exp.roiNote}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* BLOQUE 3: MATRIZ DE ACTIVIDADES (3 COLUMNAS) */}
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-zinc-100">
+                          Matriz de Actividades: Alpha vs. Alpha + Expert System vs. Omega
+                        </h3>
+                        <p className="text-xs text-zinc-400">
+                          Compara qué puedes hacer en cada actividad según tu estado de clon o uso
+                          de Expert Systems.
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {ACTIVITY_COMPARISON_MATRIX.map((row) => (
+                          <div
+                            key={row.id}
+                            className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-3"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <h4 className="text-sm font-bold text-zinc-100">{row.activity}</h4>
+                              <span className="text-[11px] font-mono px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                                {row.iskPerHour}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                              <div
+                                className={`rounded-lg border p-3 space-y-1 ${
+                                  cloneFilter === 'alpha'
+                                    ? 'border-zinc-500 bg-zinc-900'
+                                    : 'border-zinc-800/90 bg-zinc-900/40'
+                                }`}
+                              >
+                                <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase">
+                                  Alpha (0 ISK)
+                                </span>
+                                <p className="text-zinc-300 leading-relaxed">{row.alphaStatus}</p>
+                              </div>
+
+                              <div
+                                className={`rounded-lg border p-3 space-y-1 ${
+                                  cloneFilter === 'expert'
+                                    ? 'border-sky-500/70 bg-sky-500/10'
+                                    : 'border-zinc-800/90 bg-zinc-900/40'
+                                }`}
+                              >
+                                <span className="text-[10px] font-mono font-bold text-sky-300 uppercase">
+                                  Alpha + Expert System
+                                </span>
+                                <p className="text-zinc-300 leading-relaxed">{row.expertStatus}</p>
+                              </div>
+
+                              <div
+                                className={`rounded-lg border p-3 space-y-1 ${
+                                  cloneFilter === 'omega'
+                                    ? 'border-amber-500/70 bg-amber-500/10'
+                                    : 'border-zinc-800/90 bg-zinc-900/40'
+                                }`}
+                              >
+                                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase">
+                                  Omega (500 PLEX)
+                                </span>
+                                <p className="text-zinc-300 leading-relaxed">{row.omegaStatus}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* BLOQUE 4: ATAJOS ÚTILES DE MINERÍA & SUPERVIVENCIA */}
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-zinc-100 flex items-center gap-2">
+                          <Keyboard className="w-5 h-5 text-amber-400" />
+                          Atajos Útiles de EVE Online (Minería, Drones & Escape)
+                        </h3>
+                        <p className="text-xs text-zinc-400">
+                          Comandos de teclado esenciales para operar más rápido en cinturones,
+                          cortar ciclos y escapar ante amenazas en Null-Sec o Wormholes.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {MINING_SHORTCUTS.map((sc) => (
+                          <div
+                            key={sc.keys}
+                            className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-2"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <kbd className="px-2.5 py-1 rounded-md bg-zinc-900 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold">
+                                {sc.keys}
+                              </kbd>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">
+                                {sc.category}
+                              </span>
+                            </div>
+                            <h4 className="text-xs font-bold text-zinc-100">{sc.action}</h4>
+                            <p className="text-[11px] text-zinc-400 leading-relaxed">{sc.tip}</p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -637,7 +879,7 @@ export function App() {
                   <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4">
                     <div>
                       <h2 className="text-xl font-bold text-zinc-100">
-                        Módulo 3: Biblia de Habilidades (Prioridades & Topes Alpha/Omega)
+                        Módulo 3: Biblia de Habilidades (Alpha / Expert System / Omega)
                       </h2>
                       <p className="text-xs text-zinc-400">
                         Orden óptimo de entrenamiento para maximizar ISK/hora y evitar gastar SP en
@@ -674,6 +916,11 @@ export function App() {
                             <span className="text-zinc-300">
                               Alpha: <strong className="text-zinc-100">{skill.alphaCap}</strong>
                             </span>
+                            {skill.expertCap && (
+                              <span className="text-sky-300">
+                                Expert: <strong>{skill.expertCap}</strong>
+                              </span>
+                            )}
                             <span className="text-amber-400">
                               Omega: <strong>{skill.omegaCap}</strong>
                             </span>
@@ -768,7 +1015,7 @@ export function App() {
                         {[
                           { id: 'ore', label: 'Minerales & Lunas' },
                           { id: 'gas', label: 'Gas Huffing' },
-                          { id: 'ice', label: 'Hielo (Omega)' },
+                          { id: 'ice', label: 'Hielo (Expert / Omega)' },
                           { id: 'mercoxit', label: 'Mercoxit (Omega)' },
                         ].map((tab) => (
                           <button
@@ -787,13 +1034,13 @@ export function App() {
                     </div>
 
                     {specialtyTab === 'ore' && (
-                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-3 text-xs text-zinc-300 leading-relaxed">
-                        <div className="flex items-center justify-between">
+                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-4 text-xs text-zinc-300 leading-relaxed">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <h3 className="text-base font-bold text-amber-400">
                             Minería de Anomalías Soberanas & Lunas (R4 – R64)
                           </h3>
                           <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">
-                            ALPHA & OMEGA
+                            ALPHA · EXPERT SYSTEM · OMEGA
                           </span>
                         </div>
                         <p>
@@ -808,17 +1055,31 @@ export function App() {
                           alianza antes de minar una luna privada y utiliza equipamiento sin
                           residuo (Tech I / Tipo A).
                         </p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                          <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-zinc-400">ALPHA</span>
+                            <p>Venture / Pioneer con Miner II o Meta 3 (5M–18M ISK/h).</p>
+                          </div>
+                          <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-sky-300">ALPHA + EXPERT SYSTEM</span>
+                            <p>Mining Barge Operations: Procurer/Retriever con Strip Miner I (0% waste, 25M–45M ISK/h).</p>
+                          </div>
+                          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-amber-400">OMEGA</span>
+                            <p>Exhumers T2 (Hulk/Skiff/Mackinaw) + Cristales T2 y Boosts de flota (55M–110M+ ISK/h).</p>
+                          </div>
+                        </div>
                       </div>
                     )}
 
                     {specialtyTab === 'gas' && (
-                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-3 text-xs text-zinc-300 leading-relaxed">
-                        <div className="flex items-center justify-between">
+                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-4 text-xs text-zinc-300 leading-relaxed">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <h3 className="text-base font-bold text-amber-400">
                             Cosecha de Gas (Fullerites, Cytoserocin & Mykoserocin)
                           </h3>
                           <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">
-                            ALPHA & OMEGA · 20M–70M+ ISK/H
+                            ALPHA · EXPERT SYSTEM · OMEGA · 20M–100M+ ISK/H
                           </span>
                         </div>
                         <p>
@@ -842,17 +1103,31 @@ export function App() {
                             minimizar las tiradas de daño.
                           </li>
                         </ul>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                          <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-zinc-400">ALPHA</span>
+                            <p>Venture con 2x Gas Cloud Scoop (tope Gas Harvesting II, 20M–50M ISK/h).</p>
+                          </div>
+                          <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-sky-300">ALPHA + EXPERT SYSTEM</span>
+                            <p>Gas Harvesting Expert System: sube a nivel V y habilita Barcazas para gas (35M–75M ISK/h).</p>
+                          </div>
+                          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-amber-400">OMEGA</span>
+                            <p>Prospect con Covert Ops Cloak II en WH peligrosos o Covetor con 5x Scoops en flota.</p>
+                          </div>
+                        </div>
                       </div>
                     )}
 
                     {specialtyTab === 'ice' && (
-                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-3 text-xs text-zinc-300 leading-relaxed">
-                        <div className="flex items-center justify-between">
+                      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-4 text-xs text-zinc-300 leading-relaxed">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <h3 className="text-base font-bold text-amber-400">
                             Cosecha de Hielo (Isótopos, Heavy Water & Liquid Ozone)
                           </h3>
-                          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
-                            SOLO OMEGA
+                          <span className="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/40 font-mono">
+                            ALPHA + EXPERT SYSTEM / OMEGA
                           </span>
                         </div>
                         <p>
@@ -866,17 +1141,31 @@ export function App() {
                           Nitrogen, Oxygen) y <em>Liquid Ozone</em>, esenciales como combustible
                           para motores de salto capitales, cynos y estructuras Upwell.
                         </p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                          <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-zinc-400">ALPHA</span>
+                            <p>Bloqueado: ninguna nave Alpha pura puede equipar Ice Harvesters.</p>
+                          </div>
+                          <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-sky-300">ALPHA + EXPERT SYSTEM</span>
+                            <p>Desbloqueado con Mining Barge Operations: Procurer/Retriever + Ice Harvester I durante 7 días.</p>
+                          </div>
+                          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-1">
+                            <span className="text-[10px] font-mono font-bold text-amber-400">OMEGA</span>
+                            <p>Endurance camuflada y Mackinaw/Hulk con Ice Harvester II y reducción máxima de ciclo.</p>
+                          </div>
+                        </div>
                       </div>
                     )}
 
                     {specialtyTab === 'mercoxit' && (
                       <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-5 space-y-3 text-xs text-zinc-300 leading-relaxed">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <h3 className="text-base font-bold text-amber-400">
                             Extracción de Mercoxit (Fuente Única de Morphite)
                           </h3>
                           <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
-                            SOLO OMEGA
+                            SOLO OMEGA (SIN EXPERT SYSTEM)
                           </span>
                         </div>
                         <p>
@@ -886,8 +1175,9 @@ export function App() {
                         </p>
                         <p>
                           Requiere módulos <em>Deep Core</em> y la habilidad{' '}
-                          <em>Deep Core Mining</em>. Cada ciclo tiene probabilidad de generar una
-                          nube tóxica de 10 km que daña directamente tu escudo; entrenar{' '}
+                          <em>Deep Core Mining</em> (exclusiva de <strong>Omega</strong>; no existe
+                          Expert System para esta actividad). Cada ciclo tiene probabilidad de
+                          generar una nube tóxica de 10 km que daña directamente tu escudo; entrenar{' '}
                           <em>Deep Core Mining</em> a nivel V reduce esa probabilidad al 0%.
                         </p>
                       </div>
