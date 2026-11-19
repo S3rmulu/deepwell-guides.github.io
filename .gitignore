@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build & Vite/TypeScript caches
+dist/
+dist-ssr/
+.vite/
+*.tsbuildinfo
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editor & IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.local
+
+# AI / Agent & local analysis tools
+graphify-out/
+.claude/
+.cursor/
+.gemini/
+.agent/
+
+# OS & temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
