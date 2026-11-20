@@ -1,8 +1,16 @@
+import { KeyboardEvent, useRef } from 'react';
+import { Lock } from 'lucide-react';
+import { CloneFilter, VisualMode } from '../../../types';
+import { SPECIALTIES_TOPICS } from '../searchIndex';
+
 export type SpecialtyTab = 'ore' | 'gas' | 'ice' | 'mercoxit';
 
 interface SpecialtiesSectionProps {
   specialtyTab: SpecialtyTab;
   onTabChange: (tab: SpecialtyTab) => void;
+  cloneFilter: CloneFilter;
+  searchQuery: string;
+  visualMode: VisualMode;
 }
 
 const SPECIALTY_TABS: { id: SpecialtyTab; label: string }[] = [
@@ -15,15 +23,55 @@ const SPECIALTY_TABS: { id: SpecialtyTab; label: string }[] = [
 export function SpecialtiesSection({
   specialtyTab,
   onTabChange,
+  cloneFilter,
+  searchQuery,
+  visualMode,
 }: SpecialtiesSectionProps) {
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const q = searchQuery.trim().toLowerCase();
+
+  const isTabLocked = (id: SpecialtyTab): boolean => {
+    if (id === 'ice') return cloneFilter === 'alpha';
+    if (id === 'mercoxit') return cloneFilter === 'alpha' || cloneFilter === 'expert';
+    return false;
+  };
+
+  const tabMatchesQuery = (id: SpecialtyTab): boolean => {
+    if (!q) return false;
+    const entry = SPECIALTIES_TOPICS.find((t) => t.id === id);
+    return Boolean(entry && (entry.label.toLowerCase().includes(q) || entry.searchText.includes(q)));
+  };
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
+    let nextIndex = currentIndex;
+    if (event.key === 'ArrowRight') {
+      nextIndex = (currentIndex + 1) % SPECIALTY_TABS.length;
+    } else if (event.key === 'ArrowLeft') {
+      nextIndex = (currentIndex - 1 + SPECIALTY_TABS.length) % SPECIALTY_TABS.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = SPECIALTY_TABS.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    onTabChange(SPECIALTY_TABS[nextIndex].id);
+    tabRefs.current[nextIndex]?.focus();
+  };
+
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-6 space-y-5">
+    <div
+      className={`border border-zinc-800 bg-zinc-900/60 p-4 sm:p-6 space-y-5 ${
+        visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
+      }`}
+    >
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-zinc-100">
             Módulo 5: Mini-Guías Especializadas por Recurso
           </h2>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs sm:text-sm text-zinc-400">
             Selecciona la especialidad técnica para ver mecánicas específicas y rentabilidad.
           </p>
         </div>
@@ -33,20 +81,40 @@ export function SpecialtiesSection({
           role="tablist"
           aria-label="Especialidades de extracción"
         >
-          {SPECIALTY_TABS.map((tab) => {
+          {SPECIALTY_TABS.map((tab, index) => {
             const isSelected = specialtyTab === tab.id;
+            const locked = isTabLocked(tab.id);
+            const matched = tabMatchesQuery(tab.id);
             return (
               <button
                 key={tab.id}
+                ref={(el) => {
+                  tabRefs.current[index] = el;
+                }}
+                id={`specialty-tab-${tab.id}`}
                 type="button"
                 role="tab"
                 aria-selected={isSelected}
+                aria-controls={`specialty-panel-${tab.id}`}
+                tabIndex={isSelected ? 0 : -1}
                 onClick={() => onTabChange(tab.id)}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                  isSelected ? 'bg-amber-500 text-zinc-950' : 'text-zinc-400 hover:text-zinc-200'
+                onKeyDown={(e) => handleTabKeyDown(e, index)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors inline-flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-amber-500 text-zinc-950'
+                    : locked
+                    ? 'text-zinc-400 opacity-75 hover:text-zinc-200'
+                    : 'text-zinc-300 hover:text-zinc-100'
                 }`}
               >
-                {tab.label}
+                {locked && <Lock className="w-3 h-3 shrink-0" aria-hidden="true" />}
+                <span>{tab.label}</span>
+                {matched && !isSelected && (
+                  <span
+                    aria-label="Coincidencia de búsqueda"
+                    className="w-1.5 h-1.5 rounded-full bg-amber-400"
+                  />
+                )}
               </button>
             );
           })}
@@ -55,8 +123,10 @@ export function SpecialtiesSection({
 
       {specialtyTab === 'ore' && (
         <div
+          id="specialty-panel-ore"
           role="tabpanel"
-          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-4 text-xs text-zinc-300 leading-relaxed"
+          aria-labelledby="specialty-tab-ore"
+          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-4 text-sm text-zinc-300 leading-relaxed"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-base font-bold text-amber-400">
@@ -77,9 +147,9 @@ export function SpecialtiesSection({
             Consulta siempre las normas de tu alianza antes de minar una luna privada y utiliza
             equipamiento sin residuo (Tech I / Tipo A).
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs sm:text-sm">
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 space-y-1">
-              <span className="text-[10px] font-mono font-bold text-zinc-400">ALPHA</span>
+              <span className="text-[10px] font-mono font-bold text-zinc-300">ALPHA</span>
               <p>Venture / Pioneer con Miner II o Meta 3 (5M–18M ISK/h).</p>
             </div>
             <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 space-y-1">
@@ -104,8 +174,10 @@ export function SpecialtiesSection({
 
       {specialtyTab === 'gas' && (
         <div
+          id="specialty-panel-gas"
           role="tabpanel"
-          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-4 text-xs text-zinc-300 leading-relaxed"
+          aria-labelledby="specialty-tab-gas"
+          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-4 text-sm text-zinc-300 leading-relaxed"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-base font-bold text-amber-400">
@@ -133,9 +205,9 @@ export function SpecialtiesSection({
               (pré-actívalos antes de fijar objetivo) para minimizar las tiradas de daño.
             </li>
           </ul>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs sm:text-sm">
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 space-y-1">
-              <span className="text-[10px] font-mono font-bold text-zinc-400">ALPHA</span>
+              <span className="text-[10px] font-mono font-bold text-zinc-300">ALPHA</span>
               <p>Venture con 2x Gas Cloud Scoop (tope Gas Harvesting II, 20M–50M ISK/h).</p>
             </div>
             <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 space-y-1">
@@ -159,9 +231,20 @@ export function SpecialtiesSection({
 
       {specialtyTab === 'ice' && (
         <div
+          id="specialty-panel-ice"
           role="tabpanel"
-          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-4 text-xs text-zinc-300 leading-relaxed"
+          aria-labelledby="specialty-tab-ice"
+          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-4 text-sm text-zinc-300 leading-relaxed"
         >
+          {cloneFilter === 'alpha' && (
+            <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-3 text-xs text-amber-200 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-amber-400 shrink-0" aria-hidden="true" />
+              <span>
+                Actividad bloqueada para tu filtro actual <strong>Alpha puro</strong>. Requiere
+                Mining Barge Operations Expert System o cuenta Omega.
+              </span>
+            </div>
+          )}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-base font-bold text-amber-400">
               Cosecha de Hielo (Isótopos, Heavy Water & Liquid Ozone)
@@ -181,9 +264,9 @@ export function SpecialtiesSection({
             <em>Liquid Ozone</em>, esenciales como combustible para motores de salto capitales,
             cynos y estructuras Upwell.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs sm:text-sm">
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 space-y-1">
-              <span className="text-[10px] font-mono font-bold text-zinc-400">ALPHA</span>
+              <span className="text-[10px] font-mono font-bold text-zinc-300">ALPHA</span>
               <p>Bloqueado: ninguna nave Alpha pura puede equipar Ice Harvesters.</p>
             </div>
             <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 space-y-1">
@@ -208,9 +291,20 @@ export function SpecialtiesSection({
 
       {specialtyTab === 'mercoxit' && (
         <div
+          id="specialty-panel-mercoxit"
           role="tabpanel"
-          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-3 text-xs text-zinc-300 leading-relaxed"
+          aria-labelledby="specialty-tab-mercoxit"
+          className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-3 text-sm text-zinc-300 leading-relaxed"
         >
+          {(cloneFilter === 'alpha' || cloneFilter === 'expert') && (
+            <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-3 text-xs text-amber-200 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-amber-400 shrink-0" aria-hidden="true" />
+              <span>
+                Actividad exclusiva de <strong>Omega</strong>. No existe Expert System para Deep
+                Core Mining.
+              </span>
+            </div>
+          )}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-base font-bold text-amber-400">
               Extracción de Mercoxit (Fuente Única de Morphite)

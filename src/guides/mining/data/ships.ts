@@ -102,7 +102,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
     tier: 'Tier 3 · Mining Barge',
     role: 'Tanqueo Extremo & Supervivencia Null-Sec',
     clone: 'alpha-expert',
-    cloneLabel: 'OMEGA (o ALPHA con Expert System)',
+    cloneLabel: 'ALPHA + EXPERT',
     cargo: '12,000 m³ (Bodega Mineral)',
     bonuses: [
       'Escudos masivos (EHP nivel crucero pesado)',
@@ -117,7 +117,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
     tier: 'Tier 3 · Mining Barge',
     role: 'Almacenamiento Masivo en Solitario',
     clone: 'alpha-expert',
-    cloneLabel: 'OMEGA (o ALPHA con Expert System)',
+    cloneLabel: 'ALPHA + EXPERT',
     cargo: '27,500 m³ (Bodega Mineral)',
     bonuses: [
       'La mayor bodega de mineral entre las barcazas T1',
@@ -132,7 +132,7 @@ export const SHIPS_CATALOG: ShipItem[] = [
     tier: 'Tier 3 · Mining Barge',
     role: 'Máximo Rendimiento en Flota',
     clone: 'alpha-expert',
-    cloneLabel: 'OMEGA (o ALPHA con Expert System)',
+    cloneLabel: 'ALPHA + EXPERT',
     cargo: '7,000 m³ (Bodega Mineral)',
     bonuses: [
       'Extrae entre un 15% y 20% más rápido que Procurer y Retriever',

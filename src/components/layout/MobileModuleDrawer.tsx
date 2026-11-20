@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
-import { GuideModuleId } from '../../types';
+import { GuideModuleId, ModuleGroup } from '../../types';
 import { getHubHref, getMiningModuleHref } from '../../router/useHashRoute';
 
 export interface MobileModuleDrawerHandle {
@@ -11,6 +11,7 @@ export interface MobileModuleDrawerHandle {
 export interface DrawerModuleItem {
   id: GuideModuleId;
   label: string;
+  group: ModuleGroup;
   icon: React.ReactNode;
 }
 
@@ -18,14 +19,22 @@ interface MobileModuleDrawerProps {
   modules: DrawerModuleItem[];
   activeModule: GuideModuleId;
   guideTitle: string;
+  searchQuery: string;
+  matchCounts: Record<GuideModuleId, number>;
   onOpenChange: (open: boolean) => void;
 }
 
+const GROUP_ORDER: ModuleGroup[] = ['Fundamentos', 'Flota & Skills', 'Operaciones & Fittings'];
+
 export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileModuleDrawerProps>(
-  function MobileModuleDrawer({ modules, activeModule, guideTitle, onOpenChange }, ref) {
+  function MobileModuleDrawer(
+    { modules, activeModule, guideTitle, searchQuery, matchCounts, onOpenChange },
+    ref
+  ) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const scrollerRef = useRef<HTMLDivElement>(null);
     const sheetRef = useRef<HTMLElement>(null);
+    const hasSearch = searchQuery.trim().length > 0;
 
     const openDrawer = useCallback(async () => {
       const drawer = dialogRef.current;
@@ -70,25 +79,41 @@ export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileMod
       const sheet = sheetRef.current;
       if (!drawer || !scroller || !sheet) return;
 
-      const visibleThreshold = Math.max(0.001, 1 / Math.max(window.innerWidth, 1));
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[entries.length - 1];
-          if (!entry) return;
-          if (entry.intersectionRatio < visibleThreshold) {
-            if (drawer.open) {
-              drawer.close();
+      let observer: IntersectionObserver | null = null;
+      const setupObserver = () => {
+        observer?.disconnect();
+        const visibleThreshold = Math.max(0.001, 1 / Math.max(window.innerWidth, 1));
+        observer = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[entries.length - 1];
+            if (!entry) return;
+            if (entry.intersectionRatio < visibleThreshold) {
+              if (drawer.open) {
+                drawer.close();
+              }
+              onOpenChange(false);
             }
-            onOpenChange(false);
-          }
-          if (entry.intersectionRatio === 1 && drawer.open) {
-            onOpenChange(true);
-          }
-        },
-        { root: drawer, threshold: [visibleThreshold, 1] }
-      );
-      observer.observe(sheet);
+            if (entry.intersectionRatio === 1 && drawer.open) {
+              onOpenChange(true);
+            }
+          },
+          { root: drawer, threshold: [visibleThreshold, 1] }
+        );
+        observer.observe(sheet);
+      };
+
+      setupObserver();
+      window.addEventListener('resize', setupObserver, { passive: true });
+      window.addEventListener('orientationchange', setupObserver, { passive: true });
+
+      const desktopMq = window.matchMedia('(min-width: 1024px)');
+      const handleBreakpoint = (event: MediaQueryListEvent) => {
+        if (event.matches && drawer.open) {
+          drawer.close();
+          onOpenChange(false);
+        }
+      };
+      desktopMq.addEventListener('change', handleBreakpoint);
 
       const handleCancel = (event: Event) => {
         if (event.cancelable) {
@@ -116,7 +141,10 @@ export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileMod
       }
 
       return () => {
-        observer.disconnect();
+        observer?.disconnect();
+        window.removeEventListener('resize', setupObserver);
+        window.removeEventListener('orientationchange', setupObserver);
+        desktopMq.removeEventListener('change', handleBreakpoint);
         drawer.removeEventListener('cancel', handleCancel);
         drawer.removeEventListener('close', handleNativeClose);
         removeScrollFallback?.();
@@ -160,39 +188,65 @@ export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileMod
               </button>
             </div>
 
-            <ul className="p-3 space-y-1.5 overflow-y-auto">
-              {modules.map((mod) => {
-                const isActive = activeModule === mod.id;
+            <div className="p-3 space-y-4 overflow-y-auto">
+              {GROUP_ORDER.map((groupName) => {
+                const items = modules.filter((m) => m.group === groupName);
                 return (
-                  <li key={mod.id}>
-                    <a
-                      href={getMiningModuleHref(mod.id)}
-                      aria-current={isActive ? 'page' : undefined}
-                      onClick={() => closeDrawer()}
-                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
-                        isActive
-                          ? 'bg-amber-500/15 text-amber-300 border border-amber-500/40'
-                          : 'text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100 border border-transparent'
-                      }`}
-                    >
-                      <span
-                        className={isActive ? 'text-amber-400 shrink-0' : 'text-zinc-500 shrink-0'}
-                        aria-hidden="true"
-                      >
-                        {mod.icon}
-                      </span>
-                      <span className="flex-1">{mod.label}</span>
-                      {isActive && (
-                        <span
-                          aria-hidden="true"
-                          className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"
-                        />
-                      )}
-                    </a>
-                  </li>
+                  <div key={groupName} className="space-y-1">
+                    <div className="px-3 text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                      {groupName}
+                    </div>
+                    <ul className="space-y-1">
+                      {items.map((mod) => {
+                        const isActive = activeModule === mod.id;
+                        const matches = matchCounts[mod.id] ?? 0;
+                        return (
+                          <li key={mod.id}>
+                            <a
+                              href={getMiningModuleHref(mod.id)}
+                              aria-current={isActive ? 'page' : undefined}
+                              onClick={() => closeDrawer()}
+                              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
+                                isActive
+                                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/40'
+                                  : 'text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100 border border-transparent'
+                              }`}
+                            >
+                              <span
+                                className={
+                                  isActive ? 'text-amber-400 shrink-0' : 'text-zinc-400 shrink-0'
+                                }
+                                aria-hidden="true"
+                              >
+                                {mod.icon}
+                              </span>
+                              <span className="flex-1">{mod.label}</span>
+                              {hasSearch && (
+                                <span
+                                  className={`text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded ${
+                                    matches > 0
+                                      ? 'bg-amber-500/20 text-amber-300'
+                                      : 'bg-zinc-900 text-zinc-400'
+                                  }`}
+                                >
+                                  {matches}
+                                </span>
+                              )}
+                              {isActive && (
+                                <span
+                                  aria-hidden="true"
+                                  className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"
+                                />
+                              )}
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
 
             <div className="p-3 border-t border-zinc-800/90">
               <a

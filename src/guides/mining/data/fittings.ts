@@ -60,15 +60,15 @@ Core Scanner Probe I x8`,
   },
   {
     id: 'procurer-null-tank',
-    title: 'Procurer Tanque Null-Sec (Barcaza T1)',
+    title: 'Procurer Tanque Null-Sec T2 (Barcaza Omega)',
     ship: 'Procurer',
     typeId: SHIP_TYPE_IDS.Procurer,
-    clone: 'alpha-expert',
-    cloneLabel: 'OMEGA (o ALPHA + Expert System)',
+    clone: 'omega',
+    cloneLabel: 'SOLO OMEGA',
     environment: 'Null-Sec Soberanía / Lunas',
     estimatedCost: '~48M ISK',
     notes:
-      'Capaz de tanquear ratas de acorazado de Null-Sec mientras sus 5 Hobgoblin II limpian el cinturón. Si la vuelas como Alpha con Mining Barge Operations Expert System, cambia a módulos Tech I: Strip Miner I, Mining Laser Upgrade I y Hobgoblin I.',
+      'Capaz de tanquear ratas de acorazado de Null-Sec mientras sus 5 Hobgoblin II limpian el cinturón. Equipa módulos Tech II (Modulated Strip Miner II y MLU II): si juegas con Alpha + Expert System, usa el fitting "Procurer T1 Lista para Expert System" de abajo.',
     eft: `[Procurer, Deepwell Null-Sec Tank]
 Damage Control II
 Mining Laser Upgrade II
@@ -95,7 +95,7 @@ Hornet EC-300 x5`,
     ship: 'Procurer',
     typeId: SHIP_TYPE_IDS.Procurer,
     clone: 'alpha-expert',
-    cloneLabel: 'ALPHA + EXPERT SYSTEM / OMEGA',
+    cloneLabel: 'ALPHA + EXPERT',
     environment: 'Null-Sec / Lunas R32–R64 / Hielo T1',
     estimatedCost: '~38M ISK',
     notes:

@@ -41,8 +41,13 @@
     max-inline-size: 100%;
   }
 
+  :where(a, button, input, select, textarea, [tabindex='0']):focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+  }
+
   :where(
-    button,
+    button:not(.compact-control),
     select,
     textarea,
     input:not([type='checkbox'], [type='radio']),
@@ -51,6 +56,18 @@
   ) {
     min-block-size: var(--target-size);
     min-inline-size: var(--target-size);
+  }
+
+  .compact-control {
+    position: relative;
+  }
+
+  @media (pointer: coarse) {
+    .compact-control::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+    }
   }
 
   ::-webkit-scrollbar {

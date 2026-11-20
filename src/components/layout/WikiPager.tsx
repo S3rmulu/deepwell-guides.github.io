@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GuideModuleId, GuideModuleMeta } from '../../types';
-import { getMiningModuleHref } from '../../router/useHashRoute';
+import { getHubHref, getMiningModuleHref } from '../../router/useHashRoute';
 
 interface WikiPagerProps {
   modules: GuideModuleMeta[];
@@ -12,8 +12,6 @@ export function WikiPager({ modules, activeModule }: WikiPagerProps) {
   const prev = currentIndex > 0 ? modules[currentIndex - 1] : null;
   const next =
     currentIndex >= 0 && currentIndex < modules.length - 1 ? modules[currentIndex + 1] : null;
-
-  if (!prev && !next) return null;
 
   return (
     <nav
@@ -30,8 +28,8 @@ export function WikiPager({ modules, activeModule }: WikiPagerProps) {
             aria-hidden="true"
           />
           <div className="min-w-0">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
-              Anterior
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+              Capítulo anterior
             </div>
             <div className="text-xs sm:text-sm font-semibold text-zinc-200 group-hover:text-amber-300 truncate">
               {prev.label}
@@ -39,17 +37,33 @@ export function WikiPager({ modules, activeModule }: WikiPagerProps) {
           </div>
         </a>
       ) : (
-        <div className="hidden sm:block" />
+        <a
+          href={getHubHref()}
+          className="group rounded-xl border border-zinc-800 bg-zinc-950 hover:border-amber-500/50 p-3.5 sm:p-4 flex items-center gap-3 transition-colors"
+        >
+          <ChevronLeft
+            className="w-4 h-4 text-zinc-400 group-hover:text-amber-400 shrink-0"
+            aria-hidden="true"
+          />
+          <div className="min-w-0">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+              Volver al portal
+            </div>
+            <div className="text-xs sm:text-sm font-semibold text-zinc-200 group-hover:text-amber-300 truncate">
+              Índice de Todas las Guías
+            </div>
+          </div>
+        </a>
       )}
 
-      {next && (
+      {next ? (
         <a
           href={getMiningModuleHref(next.id)}
           className="group rounded-xl border border-zinc-800 bg-zinc-950 hover:border-amber-500/50 p-3.5 sm:p-4 flex items-center justify-between gap-3 text-right transition-colors sm:col-start-2"
         >
           <div className="min-w-0 flex-1">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
-              Siguiente
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+              Siguiente capítulo
             </div>
             <div className="text-xs sm:text-sm font-semibold text-zinc-200 group-hover:text-amber-300 truncate">
               {next.label}
@@ -57,6 +71,24 @@ export function WikiPager({ modules, activeModule }: WikiPagerProps) {
           </div>
           <ChevronRight
             className="w-4 h-4 text-zinc-400 group-hover:text-amber-400 shrink-0"
+            aria-hidden="true"
+          />
+        </a>
+      ) : (
+        <a
+          href={getHubHref()}
+          className="group rounded-xl border border-zinc-800 bg-zinc-950 hover:border-amber-500/50 p-3.5 sm:p-4 flex items-center justify-between gap-3 text-right transition-colors sm:col-start-2"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+              Fin del manual
+            </div>
+            <div className="text-xs sm:text-sm font-semibold text-amber-300 group-hover:text-amber-200 truncate">
+              Explorar Índice de Guías
+            </div>
+          </div>
+          <ChevronRight
+            className="w-4 h-4 text-amber-400 shrink-0"
             aria-hidden="true"
           />
         </a>

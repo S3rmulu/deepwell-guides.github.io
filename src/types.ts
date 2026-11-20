@@ -1,6 +1,10 @@
 export type CloneFilter = 'all' | 'alpha' | 'expert' | 'omega';
 
+export type VisualMode = 'dossier' | 'cards';
+
 export type GuideId = 'mining';
+
+export type ModuleGroup = 'Fundamentos' | 'Flota & Skills' | 'Operaciones & Fittings';
 
 export type GuideModuleId =
   | 'overview'
@@ -20,6 +24,7 @@ export interface GuideModuleMeta {
   slug: string;
   label: string;
   shortLabel: string;
+  group: ModuleGroup;
 }
 
 export interface GuideCardItem {
