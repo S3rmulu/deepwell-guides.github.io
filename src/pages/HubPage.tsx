@@ -1,6 +1,6 @@
 import { ChevronRight, RotateCcw, Sparkles } from 'lucide-react';
 import { GuideCardItem, VisualMode } from '../types';
-import { getMiningModuleHref } from '../router/useHashRoute';
+import { getIndustryModuleHref, getMiningModuleHref } from '../router/useHashRoute';
 import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { TacticalGridBackground } from '@/components/ui/TacticalGridBackground';
 
@@ -8,6 +8,30 @@ interface HubPageProps {
   guides: GuideCardItem[];
   visualMode: VisualMode;
   onResetFilters: () => void;
+}
+
+function getGuidePrimaryHref(guideId: string): string {
+  if (guideId === 'industry-reactions') {
+    return getIndustryModuleHref('overview');
+  }
+  return getMiningModuleHref('overview');
+}
+
+function getGuideQuickLinks(guideId: string): { id: string; label: string; href: string }[] {
+  if (guideId === 'industry-reactions') {
+    return [
+      { id: 'blueprints', label: 'Planos, ME/TE & SCI', href: getIndustryModuleHref('blueprints') },
+      { id: 'workflow', label: 'Invención Tech II', href: getIndustryModuleHref('workflow') },
+      { id: 'economy', label: 'Break-Even & Impuestos', href: getIndustryModuleHref('economy') },
+      { id: 'skills', label: 'Productos & Skills', href: getIndustryModuleHref('skills') },
+    ];
+  }
+  return [
+    { id: 'ships', label: 'Catálogo Naves ORE', href: getMiningModuleHref('ships') },
+    { id: 'skills', label: 'Biblia de Skills', href: getMiningModuleHref('skills') },
+    { id: 'nullsec', label: 'Protocolo Null-Sec', href: getMiningModuleHref('nullsec') },
+    { id: 'fittings', label: 'Fittings EFT', href: getMiningModuleHref('fittings') },
+  ];
 }
 
 export function HubPage({ guides, visualMode, onResetFilters }: HubPageProps) {
@@ -38,8 +62,8 @@ export function HubPage({ guides, visualMode, onResetFilters }: HubPageProps) {
           </h1>
           <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
             Referencia práctica por módulos para pilotos Alpha, Alpha con Expert System y Omega. Sin
-            relleno: datos verificados de naves ORE, límites de skills, protocolos Null-Sec y
-            fittings listos para importar en EFT.
+            relleno: datos verificados de naves ORE, cadenas industriales BPO/BPC, invención Tech II,
+            márgenes de mercado y fittings listos para importar en EFT.
           </p>
         </div>
       </section>
@@ -63,61 +87,58 @@ export function HubPage({ guides, visualMode, onResetFilters }: HubPageProps) {
         </div>
       ) : visualMode === 'dossier' ? (
         <div className="space-y-6">
-          {activeGuides.map((guide) => (
-            <SpotlightCard
-              key={guide.id}
-              tone="amber"
-              className="rounded-lg border border-amber-500/40 bg-zinc-950 p-5 sm:p-6"
-            >
-              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                <div className="space-y-2.5 max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400">
-                      {guide.category}
-                    </span>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                      MANUAL ACTIVO · {guide.readTime} · {guide.updatedAt}
-                    </span>
+          {activeGuides.map((guide) => {
+            const primaryHref = getGuidePrimaryHref(guide.id);
+            const quickLinks = getGuideQuickLinks(guide.id);
+            return (
+              <SpotlightCard
+                key={guide.id}
+                tone="amber"
+                className="rounded-lg border border-amber-500/40 bg-zinc-950 p-5 sm:p-6"
+              >
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                  <div className="space-y-2.5 max-w-3xl">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400">
+                        {guide.category}
+                      </span>
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        MANUAL ACTIVO · {guide.readTime} · {guide.updatedAt}
+                      </span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-zinc-100">{guide.title}</h2>
+                    <p className="text-sm text-zinc-300 leading-relaxed">{guide.summary}</p>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-zinc-100">{guide.title}</h2>
-                  <p className="text-sm text-zinc-300 leading-relaxed">{guide.summary}</p>
+
+                  <a
+                    href={primaryHref}
+                    className="tactical-btn inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs sm:text-sm transition-colors shrink-0"
+                  >
+                    <span>Abrir Guía Maestra</span>
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                  </a>
                 </div>
 
-                <a
-                  href={getMiningModuleHref('overview')}
-                  className="tactical-btn inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs sm:text-sm transition-colors shrink-0"
-                >
-                  <span>Abrir Guía Maestra</span>
-                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                </a>
-              </div>
-
-              <div className="pt-4 border-t border-zinc-800/90 space-y-2">
-                <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-                  Accesos directos por capítulo
+                <div className="pt-4 border-t border-zinc-800/90 space-y-2">
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                    Accesos directos por capítulo
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {quickLinks.map((quick) => (
+                      <a
+                        key={quick.id}
+                        href={quick.href}
+                        className="tactical-btn rounded-md border border-zinc-800 bg-zinc-900/70 hover:border-amber-500/50 px-3 py-2 text-xs font-semibold text-zinc-200 hover:text-amber-300 flex items-center justify-between gap-2 transition-colors"
+                      >
+                        <span className="truncate">{quick.label}</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {(
-                    [
-                      { id: 'ships', label: 'Catálogo Naves ORE' },
-                      { id: 'skills', label: 'Biblia de Skills' },
-                      { id: 'nullsec', label: 'Protocolo Null-Sec' },
-                      { id: 'fittings', label: 'Fittings EFT' },
-                    ] as const
-                  ).map((quick) => (
-                    <a
-                      key={quick.id}
-                      href={getMiningModuleHref(quick.id)}
-                      className="tactical-btn rounded-md border border-zinc-800 bg-zinc-900/70 hover:border-amber-500/50 px-3 py-2 text-xs font-semibold text-zinc-200 hover:text-amber-300 flex items-center justify-between gap-2 transition-colors"
-                    >
-                      <span className="truncate">{quick.label}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </SpotlightCard>
-          ))}
+              </SpotlightCard>
+            );
+          })}
 
           {plannedGuides.length > 0 && (
             <section aria-label="Roadmap de próximas guías" className="space-y-3">
@@ -200,7 +221,7 @@ export function HubPage({ guides, visualMode, onResetFilters }: HubPageProps) {
                 </span>
                 {guide.status === 'active' ? (
                   <a
-                    href={getMiningModuleHref('overview')}
+                    href={getGuidePrimaryHref(guide.id)}
                     className="tactical-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs transition-colors"
                   >
                     <span>Abrir Guía Maestra</span>

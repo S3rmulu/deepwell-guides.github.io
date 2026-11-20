@@ -1,7 +1,7 @@
 import { BookOpen, Cpu, Flame, Layers, Pickaxe, Rocket, ShieldAlert } from 'lucide-react';
-import { GuideModuleMeta } from '../../types';
+import { GuideModuleMeta, MiningModuleId } from '../../types';
 
-export interface MiningModuleItem extends GuideModuleMeta {
+export interface MiningModuleItem extends GuideModuleMeta<MiningModuleId> {
   icon: React.ReactNode;
 }
 

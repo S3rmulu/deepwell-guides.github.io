@@ -3,8 +3,8 @@ import { RefObject } from 'react';
 import {
   CloneFilter,
   FittingItem,
-  GuideModuleId,
-  ModuleGroup,
+  MiningModuleGroup,
+  MiningModuleId,
   ShipItem,
   SkillItem,
   VisualMode,
@@ -26,13 +26,13 @@ import { SpecialtiesSection, SpecialtyTab } from './sections/SpecialtiesSection'
 import { FittingsSection } from './sections/FittingsSection';
 
 interface MiningGuideLayoutProps {
-  activeModule: GuideModuleId;
+  activeModule: MiningModuleId;
   cloneFilter: CloneFilter;
   searchQuery: string;
   visualMode: VisualMode;
   invalidSlug?: string;
   onDismissInvalidSlug: () => void;
-  matchCounts: Record<GuideModuleId, number>;
+  matchCounts: Record<MiningModuleId, number>;
   ships: ShipItem[];
   skills: SkillItem[];
   fittings: FittingItem[];
@@ -52,7 +52,7 @@ interface MiningGuideLayoutProps {
   onDrawerOpenChange: (open: boolean) => void;
 }
 
-const GROUP_ORDER: ModuleGroup[] = ['Fundamentos', 'Flota & Skills', 'Operaciones & Fittings'];
+const GROUP_ORDER: MiningModuleGroup[] = ['Fundamentos', 'Flota & Skills', 'Operaciones & Fittings'];
 
 export function MiningGuideLayout({
   activeModule,

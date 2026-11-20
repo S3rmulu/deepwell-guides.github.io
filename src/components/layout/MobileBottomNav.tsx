@@ -1,20 +1,22 @@
 import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
-import { GuideModuleId, GuideModuleMeta } from '../../types';
-import { getHubHref, getMiningModuleHref } from '../../router/useHashRoute';
+import { GuideId, GuideModuleId, GuideModuleMeta } from '../../types';
+import { getGuideModuleHref, getHubHref } from '../../router/useHashRoute';
 
-interface MobileBottomNavProps {
-  modules: GuideModuleMeta[];
-  activeModule: GuideModuleId;
+interface MobileBottomNavProps<TId extends GuideModuleId = GuideModuleId> {
+  guideId?: GuideId;
+  modules: GuideModuleMeta<TId>[];
+  activeModule: TId;
   isDrawerOpen: boolean;
   onOpenDrawer: () => void;
 }
 
-export function MobileBottomNav({
+export function MobileBottomNav<TId extends GuideModuleId = GuideModuleId>({
+  guideId = 'mining',
   modules,
   activeModule,
   isDrawerOpen,
   onOpenDrawer,
-}: MobileBottomNavProps) {
+}: MobileBottomNavProps<TId>) {
   const idx = modules.findIndex((m) => m.id === activeModule);
   const currentPos = idx >= 0 ? idx + 1 : 1;
   const prev = idx > 0 ? modules[idx - 1] : null;
@@ -33,7 +35,7 @@ export function MobileBottomNav({
       <div className="max-w-lg mx-auto grid grid-cols-3 gap-1.5 items-center">
         {prev ? (
           <a
-            href={getMiningModuleHref(prev.id)}
+            href={getGuideModuleHref(guideId, prev.id)}
             className="inline-flex items-center justify-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/90 px-2.5 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-500/50 transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-amber-400 shrink-0" aria-hidden="true" />
@@ -64,7 +66,7 @@ export function MobileBottomNav({
 
         {next ? (
           <a
-            href={getMiningModuleHref(next.id)}
+            href={getGuideModuleHref(guideId, next.id)}
             className="inline-flex items-center justify-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/90 px-2.5 py-2 text-xs font-semibold text-zinc-200 hover:border-amber-500/50 transition-colors"
           >
             <span className="truncate">Siguiente</span>

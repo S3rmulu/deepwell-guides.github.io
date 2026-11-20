@@ -2,11 +2,17 @@ export type CloneFilter = 'all' | 'alpha' | 'expert' | 'omega';
 
 export type VisualMode = 'dossier' | 'cards';
 
-export type GuideId = 'mining';
+export type GuideId = 'mining' | 'industry';
 
-export type ModuleGroup = 'Fundamentos' | 'Flota & Skills' | 'Operaciones & Fittings';
+export type MiningModuleGroup = 'Fundamentos' | 'Flota & Skills' | 'Operaciones & Fittings';
+export type IndustryModuleGroup =
+  | 'Fundamentos & Planos'
+  | 'Producción & Economía'
+  | 'Estrategia & Habilidades';
 
-export type GuideModuleId =
+export type ModuleGroup = MiningModuleGroup | IndustryModuleGroup;
+
+export type MiningModuleId =
   | 'overview'
   | 'mechanics'
   | 'ships'
@@ -15,12 +21,17 @@ export type GuideModuleId =
   | 'specialties'
   | 'fittings';
 
+export type IndustryModuleId = 'overview' | 'blueprints' | 'workflow' | 'economy' | 'skills';
+
+export type GuideModuleId = MiningModuleId | IndustryModuleId;
+
 export type WikiRoute =
   | { view: 'hub' }
-  | { view: 'guide'; guideId: GuideId; moduleId: GuideModuleId };
+  | { view: 'guide'; guideId: 'mining'; moduleId: MiningModuleId }
+  | { view: 'guide'; guideId: 'industry'; moduleId: IndustryModuleId };
 
-export interface GuideModuleMeta {
-  id: GuideModuleId;
+export interface GuideModuleMeta<TId extends string = GuideModuleId> {
+  id: TId;
   slug: string;
   label: string;
   shortLabel: string;
@@ -115,4 +126,24 @@ export interface ShortcutItem {
   action: string;
   category: 'Minería & Módulos' | 'Drones' | 'Supervivencia & Navegación' | 'Gestión & Fitting';
   tip: string;
+}
+
+export interface IndustryStarterProductItem {
+  id: string;
+  category: 'Drones T1' | 'Munición y Misiles T1' | 'Módulos Frecuentes' | 'Cascos Ligeros T1';
+  items: { name: string; typeId: number }[];
+  clone: 'alpha-omega' | 'omega';
+  rotationNote: string;
+  upgradePath: string;
+}
+
+export interface IndustryChainTabItem {
+  id: 'ham-t2' | 'moon-goo' | 'capitals';
+  label: string;
+  clone: 'omega';
+  title: string;
+  inputs: string[];
+  facility: string;
+  summary: string;
+  steps: string[];
 }

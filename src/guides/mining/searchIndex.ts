@@ -1,4 +1,4 @@
-import { CloneFilter, GuideModuleId } from '../../types';
+import { CloneFilter, MiningModuleId } from '../../types';
 import { matchesClone } from '../../components/ui/cloneBadges';
 import {
   ACTIVITY_COMPARISON_MATRIX,
@@ -92,7 +92,7 @@ export const SPECIALTIES_TOPICS = [
 export function getModuleSearchMatches(
   rawQuery: string,
   cloneFilter: CloneFilter
-): Record<GuideModuleId, number> {
+): Record<MiningModuleId, number> {
   const q = rawQuery.trim().toLowerCase();
   if (!q) {
     return {

@@ -8,6 +8,8 @@ interface FilterBannerProps {
   shipsCount: number;
   skillsCount: number;
   fittingsCount: number;
+  industryProductsCount?: number;
+  industrySkillsCount?: number;
   onReset: () => void;
 }
 
@@ -18,11 +20,20 @@ export function FilterBanner({
   shipsCount,
   skillsCount,
   fittingsCount,
+  industryProductsCount = 0,
+  industrySkillsCount = 0,
   onReset,
 }: FilterBannerProps) {
   if (cloneFilter === 'all') return null;
 
   const isExpert = cloneFilter === 'expert';
+
+  const summaryText =
+    route.view === 'hub'
+      ? `— Mostrando ${guidesCount} guías compatibles.`
+      : route.guideId === 'industry'
+      ? `— ${industryProductsCount} líneas de producto y ${industrySkillsCount} skills industriales compatibles.`
+      : `— ${shipsCount} naves, ${skillsCount} skills y ${fittingsCount} fittings compatibles.`;
 
   return (
     <div
@@ -47,11 +58,9 @@ export function FilterBanner({
                 ? 'Clon Alpha (Gratuito · 0 ISK / 0 PLEX)'
                 : cloneFilter === 'expert'
                 ? 'Alpha + Expert System (Acceso temporal 7 días)'
-                : 'Solo Omega (Módulos T2, Exhumers, Mercoxit y Mando)'}
+                : 'Solo Omega (Invención T2, Exhumers, Mercoxit y Mando)'}
             </strong>{' '}
-            {route.view === 'hub'
-              ? `— Mostrando ${guidesCount} guías compatibles.`
-              : `— ${shipsCount} naves, ${skillsCount} skills y ${fittingsCount} fittings compatibles.`}
+            {summaryText}
           </span>
         </div>
         <button

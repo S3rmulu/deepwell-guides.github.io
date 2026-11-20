@@ -4,6 +4,8 @@ import { useHashRoute } from './router/useHashRoute';
 import { PORTAL_GUIDES } from './data/portalGuides';
 import { FITTINGS_LIST, SHIPS_CATALOG, SKILLS_BIBLE } from './guides/mining/data';
 import { getModuleSearchMatches } from './guides/mining/searchIndex';
+import { INDUSTRY_SKILLS_BIBLE, STARTER_PRODUCTS } from './guides/industry/data';
+import { getIndustrySearchMatches } from './guides/industry/searchIndex';
 import { matchesClone } from './components/ui/cloneBadges';
 import { Header } from './components/layout/Header';
 import { MobileControlsBar } from './components/layout/MobileControlsBar';
@@ -12,6 +14,7 @@ import { Footer } from './components/layout/Footer';
 import { MobileModuleDrawerHandle } from './components/layout/MobileModuleDrawer';
 import { HubPage } from './pages/HubPage';
 import { MiningGuideLayout } from './guides/mining/MiningGuideLayout';
+import { IndustryGuideLayout } from './guides/industry/IndustryGuideLayout';
 import { SpecialtyTab } from './guides/mining/sections/SpecialtiesSection';
 
 const VISUAL_MODE_STORAGE_KEY = 'deepwell-visual-mode';
@@ -240,8 +243,40 @@ export function App() {
     });
   }, [cloneFilter, searchQuery]);
 
-  const matchCounts = useMemo(
+  const filteredIndustryProducts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return STARTER_PRODUCTS.filter((prod) => {
+      const cloneOk = matchesClone(prod.clone, cloneFilter);
+      const queryOk =
+        !query ||
+        prod.category.toLowerCase().includes(query) ||
+        prod.rotationNote.toLowerCase().includes(query) ||
+        prod.upgradePath.toLowerCase().includes(query) ||
+        prod.items.some((it) => it.name.toLowerCase().includes(query));
+      return cloneOk && queryOk;
+    });
+  }, [cloneFilter, searchQuery]);
+
+  const filteredIndustrySkills = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return INDUSTRY_SKILLS_BIBLE.filter((skill) => {
+      const cloneOk = matchesClone(skill.clone, cloneFilter);
+      const queryOk =
+        !query ||
+        skill.name.toLowerCase().includes(query) ||
+        skill.category.toLowerCase().includes(query) ||
+        skill.effect.toLowerCase().includes(query);
+      return cloneOk && queryOk;
+    });
+  }, [cloneFilter, searchQuery]);
+
+  const miningMatchCounts = useMemo(
     () => getModuleSearchMatches(searchQuery, cloneFilter),
+    [searchQuery, cloneFilter]
+  );
+
+  const industryMatchCounts = useMemo(
+    () => getIndustrySearchMatches(searchQuery, cloneFilter),
     [searchQuery, cloneFilter]
   );
 
@@ -293,6 +328,8 @@ export function App() {
         shipsCount={filteredShips.length}
         skillsCount={filteredSkills.length}
         fittingsCount={filteredFittings.length}
+        industryProductsCount={filteredIndustryProducts.length}
+        industrySkillsCount={filteredIndustrySkills.length}
         onReset={() => handleCloneFilterChange('all')}
       />
 
@@ -306,6 +343,24 @@ export function App() {
             visualMode={visualMode}
             onResetFilters={handleResetFilters}
           />
+        ) : route.guideId === 'industry' ? (
+          <IndustryGuideLayout
+            activeModule={route.moduleId}
+            cloneFilter={cloneFilter}
+            searchQuery={searchQuery}
+            visualMode={visualMode}
+            invalidSlug={visibleInvalidSlug}
+            onDismissInvalidSlug={() => setDismissedInvalidSlug(invalidSlug)}
+            matchCounts={industryMatchCounts}
+            products={filteredIndustryProducts}
+            skills={filteredIndustrySkills}
+            onResetFilters={handleResetFilters}
+            onResetSearch={handleResetSearch}
+            drawerRef={drawerRef}
+            isDrawerOpen={isDrawerOpen}
+            onOpenDrawer={handleOpenDrawer}
+            onDrawerOpenChange={setIsDrawerOpen}
+          />
         ) : (
           <MiningGuideLayout
             activeModule={route.moduleId}
@@ -314,7 +369,7 @@ export function App() {
             visualMode={visualMode}
             invalidSlug={visibleInvalidSlug}
             onDismissInvalidSlug={() => setDismissedInvalidSlug(invalidSlug)}
-            matchCounts={matchCounts}
+            matchCounts={miningMatchCounts}
             ships={filteredShips}
             skills={filteredSkills}
             fittings={filteredFittings}

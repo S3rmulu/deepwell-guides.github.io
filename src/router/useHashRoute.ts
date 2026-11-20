@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { GuideModuleId, WikiRoute } from '../types';
+import {
+  GuideId,
+  GuideModuleId,
+  IndustryModuleId,
+  MiningModuleId,
+  WikiRoute,
+} from '../types';
 
-const MODULE_TO_SLUG: Record<GuideModuleId, string> = {
+const MINING_MODULE_TO_SLUG: Record<MiningModuleId, string> = {
   overview: 'resumen',
   mechanics: 'mecanicas',
   ships: 'naves',
@@ -11,7 +17,7 @@ const MODULE_TO_SLUG: Record<GuideModuleId, string> = {
   fittings: 'fittings',
 };
 
-const SLUG_TO_MODULE: Record<string, GuideModuleId> = {
+const SLUG_TO_MINING_MODULE: Record<string, MiningModuleId> = {
   resumen: 'overview',
   overview: 'overview',
   mecanicas: 'mechanics',
@@ -25,6 +31,30 @@ const SLUG_TO_MODULE: Record<string, GuideModuleId> = {
   fittings: 'fittings',
 };
 
+const INDUSTRY_MODULE_TO_SLUG: Record<IndustryModuleId, string> = {
+  overview: 'resumen',
+  blueprints: 'planos',
+  workflow: 'proceso',
+  economy: 'economia',
+  skills: 'skills',
+};
+
+const SLUG_TO_INDUSTRY_MODULE: Record<string, IndustryModuleId> = {
+  resumen: 'overview',
+  overview: 'overview',
+  planos: 'blueprints',
+  blueprints: 'blueprints',
+  proceso: 'workflow',
+  workflow: 'workflow',
+  invencion: 'workflow',
+  invention: 'workflow',
+  economia: 'economy',
+  economy: 'economy',
+  impuestos: 'economy',
+  skills: 'skills',
+  estrategias: 'skills',
+};
+
 export interface ParsedHashResult {
   route: WikiRoute;
   params: URLSearchParams;
@@ -35,11 +65,10 @@ export function getHubHref(): string {
   return '#/guias';
 }
 
-export function getMiningModuleHref(
-  moduleId: GuideModuleId,
+function appendQueryParams(
+  base: string,
   params?: Record<string, string | undefined>
 ): string {
-  const base = `#/mineria/${MODULE_TO_SLUG[moduleId]}`;
   if (!params) return base;
   const search = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
@@ -47,6 +76,39 @@ export function getMiningModuleHref(
   }
   const qs = search.toString();
   return qs ? `${base}?${qs}` : base;
+}
+
+export function getMiningModuleHref(
+  moduleId: MiningModuleId,
+  params?: Record<string, string | undefined>
+): string {
+  const base = `#/mineria/${MINING_MODULE_TO_SLUG[moduleId]}`;
+  return appendQueryParams(base, params);
+}
+
+export function getIndustryModuleHref(
+  moduleId: IndustryModuleId,
+  params?: Record<string, string | undefined>
+): string {
+  const base = `#/industria/${INDUSTRY_MODULE_TO_SLUG[moduleId]}`;
+  return appendQueryParams(base, params);
+}
+
+export function getGuideModuleHref(
+  guideId: GuideId,
+  moduleId: GuideModuleId,
+  params?: Record<string, string | undefined>
+): string {
+  if (guideId === 'industry') {
+    const indMod = (
+      moduleId in INDUSTRY_MODULE_TO_SLUG ? moduleId : 'overview'
+    ) as IndustryModuleId;
+    return getIndustryModuleHref(indMod, params);
+  }
+  const minMod = (
+    moduleId in MINING_MODULE_TO_SLUG ? moduleId : 'overview'
+  ) as MiningModuleId;
+  return getMiningModuleHref(minMod, params);
 }
 
 export function parseHash(hash: string): ParsedHashResult {
@@ -74,7 +136,7 @@ export function parseHash(hash: string): ParsedHashResult {
         params,
       };
     }
-    const mapped = SLUG_TO_MODULE[sub];
+    const mapped = SLUG_TO_MINING_MODULE[sub];
     if (mapped) {
       return {
         route: { view: 'guide', guideId: 'mining', moduleId: mapped },
@@ -83,6 +145,27 @@ export function parseHash(hash: string): ParsedHashResult {
     }
     return {
       route: { view: 'guide', guideId: 'mining', moduleId: 'overview' },
+      params,
+      invalidSlug: sub,
+    };
+  }
+
+  if (section === 'industria' || section === 'industry') {
+    if (!sub) {
+      return {
+        route: { view: 'guide', guideId: 'industry', moduleId: 'overview' },
+        params,
+      };
+    }
+    const mapped = SLUG_TO_INDUSTRY_MODULE[sub];
+    if (mapped) {
+      return {
+        route: { view: 'guide', guideId: 'industry', moduleId: mapped },
+        params,
+      };
+    }
+    return {
+      route: { view: 'guide', guideId: 'industry', moduleId: 'overview' },
       params,
       invalidSlug: sub,
     };
@@ -133,8 +216,21 @@ export function useHashRoute() {
   }, []);
 
   const navigateToMiningModule = useCallback(
-    (moduleId: GuideModuleId, params?: Record<string, string | undefined>) => {
+    (moduleId: MiningModuleId, params?: Record<string, string | undefined>) => {
       const target = getMiningModuleHref(moduleId, params);
+      if (window.location.hash !== target) {
+        window.location.hash = target;
+      } else {
+        setParsed(parseHash(target));
+        scrollToTopAccessible();
+      }
+    },
+    []
+  );
+
+  const navigateToIndustryModule = useCallback(
+    (moduleId: IndustryModuleId, params?: Record<string, string | undefined>) => {
+      const target = getIndustryModuleHref(moduleId, params);
       if (window.location.hash !== target) {
         window.location.hash = target;
       } else {
@@ -151,5 +247,6 @@ export function useHashRoute() {
     invalidSlug: parsed.invalidSlug,
     navigateToHub,
     navigateToMiningModule,
+    navigateToIndustryModule,
   };
 }

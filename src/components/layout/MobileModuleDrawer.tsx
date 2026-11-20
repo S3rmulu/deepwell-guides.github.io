@@ -1,34 +1,49 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { ArrowLeft, X } from 'lucide-react';
-import { GuideModuleId, ModuleGroup } from '../../types';
-import { getHubHref, getMiningModuleHref } from '../../router/useHashRoute';
+import { GuideId, GuideModuleId, ModuleGroup } from '../../types';
+import { getGuideModuleHref, getHubHref } from '../../router/useHashRoute';
 
 export interface MobileModuleDrawerHandle {
   open: () => void;
   close: () => void;
 }
 
-export interface DrawerModuleItem {
-  id: GuideModuleId;
+export interface DrawerModuleItem<TId extends GuideModuleId = GuideModuleId> {
+  id: TId;
   label: string;
   group: ModuleGroup;
   icon: React.ReactNode;
 }
 
-interface MobileModuleDrawerProps {
-  modules: DrawerModuleItem[];
-  activeModule: GuideModuleId;
+interface MobileModuleDrawerProps<TId extends GuideModuleId = GuideModuleId> {
+  guideId?: GuideId;
+  groupOrder?: ModuleGroup[];
+  modules: DrawerModuleItem<TId>[];
+  activeModule: TId;
   guideTitle: string;
   searchQuery: string;
-  matchCounts: Record<GuideModuleId, number>;
+  matchCounts: Record<string, number>;
   onOpenChange: (open: boolean) => void;
 }
 
-const GROUP_ORDER: ModuleGroup[] = ['Fundamentos', 'Flota & Skills', 'Operaciones & Fittings'];
+const DEFAULT_GROUP_ORDER: ModuleGroup[] = [
+  'Fundamentos',
+  'Flota & Skills',
+  'Operaciones & Fittings',
+];
 
-export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileModuleDrawerProps>(
+export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileModuleDrawerProps<any>>(
   function MobileModuleDrawer(
-    { modules, activeModule, guideTitle, searchQuery, matchCounts, onOpenChange },
+    {
+      guideId = 'mining',
+      groupOrder = DEFAULT_GROUP_ORDER,
+      modules,
+      activeModule,
+      guideTitle,
+      searchQuery,
+      matchCounts,
+      onOpenChange,
+    },
     ref
   ) {
     const dialogRef = useRef<HTMLDialogElement>(null);
@@ -189,8 +204,9 @@ export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileMod
             </div>
 
             <div className="p-3 space-y-4 overflow-y-auto">
-              {GROUP_ORDER.map((groupName) => {
+              {groupOrder.map((groupName) => {
                 const items = modules.filter((m) => m.group === groupName);
+                if (items.length === 0) return null;
                 return (
                   <div key={groupName} className="space-y-1">
                     <div className="px-3 text-[10px] font-mono uppercase tracking-wider text-zinc-400">
@@ -203,7 +219,7 @@ export const MobileModuleDrawer = forwardRef<MobileModuleDrawerHandle, MobileMod
                         return (
                           <li key={mod.id}>
                             <a
-                              href={getMiningModuleHref(mod.id)}
+                              href={getGuideModuleHref(guideId, mod.id)}
                               aria-current={isActive ? 'page' : undefined}
                               onClick={() => closeDrawer()}
                               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors ${

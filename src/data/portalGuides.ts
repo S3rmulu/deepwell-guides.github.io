@@ -27,15 +27,15 @@ export const PORTAL_GUIDES: GuideCardItem[] = [
   },
   {
     id: 'industry-reactions',
-    title: 'Reprocesado, Reacciones Bioquímicas & T2',
-    category: 'Manufactura Avanzada',
-    status: 'coming-soon',
-    cloneAccess: 'omega',
+    title: 'Industria, Planos (BPO/BPC), Invención T2 & Economía',
+    category: 'Manufactura & Mercado',
+    status: 'active',
+    cloneAccess: 'alpha-omega',
     summary:
-      'Cadenas de producción desde mineral comprimido y gas Fullerite/Cytoserocin hasta componentes T2, boosters y naves capitales.',
-    readTime: '22 min',
-    updatedAt: 'Próximamente',
-    tags: ['Reacciones', 'Morphite', 'Boosters'],
+      'Cadena industrial completa desde materias primas y planos T1 (ME 10 / TE 20) hasta Invención Tech II con Datacores y Decryptors, System Cost Index (SCI), cálculo de Break-Even en hubs y productos de alta rotación.',
+    readTime: '16 min',
+    updatedAt: 'Noviembre 2026',
+    tags: ['BPO & BPC', 'Invention T2', 'ME / TE', 'Break-Even ISK', 'Upwell'],
   },
   {
     id: 'nullsec-survival',
