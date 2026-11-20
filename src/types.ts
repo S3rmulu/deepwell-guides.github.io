@@ -39,9 +39,20 @@ export interface GuideCardItem {
   tags: string[];
 }
 
+export type ShipClass =
+  | 'Mining Frigate'
+  | 'Mining Destroyer'
+  | 'Expedition Frigate'
+  | 'Mining Barge'
+  | 'Exhumer'
+  | 'Industrial Command Ship'
+  | 'Capital Industrial Ship'
+  | 'Hauler / Logística';
+
 export interface ShipItem {
   name: string;
   typeId: number;
+  shipClass: ShipClass;
   secondaryHulls?: { name: string; typeId: number }[];
   tier: string;
   role: string;

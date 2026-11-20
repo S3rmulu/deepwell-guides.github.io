@@ -1,4 +1,15 @@
-import { ShipItem } from '../../../types';
+import { ShipClass, ShipItem } from '../../../types';
+
+export const SHIP_CLASSES_ORDER: ShipClass[] = [
+  'Mining Frigate',
+  'Mining Destroyer',
+  'Expedition Frigate',
+  'Mining Barge',
+  'Exhumer',
+  'Industrial Command Ship',
+  'Capital Industrial Ship',
+  'Hauler / Logística',
+];
 
 export const SHIP_TYPE_IDS: Record<string, number> = {
   Venture: 32880,
@@ -16,13 +27,15 @@ export const SHIP_TYPE_IDS: Record<string, number> = {
   Orca: 28606,
   Rorqual: 28352,
   Miasmos: 656,
+  Bowhead: 34328,
 };
 
 export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Venture',
     typeId: SHIP_TYPE_IDS.Venture,
-    tier: 'Tier 1 · Fragata Minera',
+    shipClass: 'Mining Frigate',
+    tier: 'Mining Frigate · Tech I',
     role: 'Inicio, Gas Huffing & Ninja Mining',
     clone: 'alpha-omega',
     cloneLabel: 'ALPHA & OMEGA',
@@ -38,7 +51,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Venture Consortium Issue',
     typeId: SHIP_TYPE_IDS['Venture Consortium Issue'],
-    tier: 'Tier 1 · Fragata de Facción',
+    shipClass: 'Mining Frigate',
+    tier: 'Mining Frigate · Facción',
     role: 'Extracción Rápida & Movilidad',
     clone: 'alpha-omega',
     cloneLabel: 'ALPHA & OMEGA',
@@ -53,7 +67,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Pioneer',
     typeId: SHIP_TYPE_IDS.Pioneer,
-    tier: 'Tier 1.5 · Destructor Minero',
+    shipClass: 'Mining Destroyer',
+    tier: 'Mining Destroyer · Tech I',
     role: 'Puente Intermedio de Extracción',
     clone: 'alpha-omega',
     cloneLabel: 'ALPHA & OMEGA',
@@ -68,7 +83,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Prospect',
     typeId: SHIP_TYPE_IDS.Prospect,
-    tier: 'Tier 2 · Fragata de Expedición T2',
+    shipClass: 'Expedition Frigate',
+    tier: 'Expedition Frigate · Tech II',
     role: 'Operaciones Encubiertas & Gas de Alto Riesgo',
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
@@ -84,7 +100,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Endurance',
     typeId: SHIP_TYPE_IDS.Endurance,
-    tier: 'Tier 2 · Fragata de Expedición T2',
+    shipClass: 'Expedition Frigate',
+    tier: 'Expedition Frigate · Tech II',
     role: 'Cosecha de Hielo Táctica',
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
@@ -99,7 +116,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Procurer',
     typeId: SHIP_TYPE_IDS.Procurer,
-    tier: 'Tier 3 · Mining Barge',
+    shipClass: 'Mining Barge',
+    tier: 'Mining Barge · Tech I',
     role: 'Tanqueo Extremo & Supervivencia Null-Sec',
     clone: 'alpha-expert',
     cloneLabel: 'ALPHA + EXPERT',
@@ -114,7 +132,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Retriever',
     typeId: SHIP_TYPE_IDS.Retriever,
-    tier: 'Tier 3 · Mining Barge',
+    shipClass: 'Mining Barge',
+    tier: 'Mining Barge · Tech I',
     role: 'Almacenamiento Masivo en Solitario',
     clone: 'alpha-expert',
     cloneLabel: 'ALPHA + EXPERT',
@@ -129,7 +148,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Covetor',
     typeId: SHIP_TYPE_IDS.Covetor,
-    tier: 'Tier 3 · Mining Barge',
+    shipClass: 'Mining Barge',
+    tier: 'Mining Barge · Tech I',
     role: 'Máximo Rendimiento en Flota',
     clone: 'alpha-expert',
     cloneLabel: 'ALPHA + EXPERT',
@@ -144,7 +164,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Skiff',
     typeId: SHIP_TYPE_IDS.Skiff,
-    tier: 'Tier 4 · Exhumer Tech II',
+    shipClass: 'Exhumer',
+    tier: 'Exhumer · Tech II',
     role: 'Fortaleza de Extracción Null-Sec',
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
@@ -159,7 +180,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Mackinaw',
     typeId: SHIP_TYPE_IDS.Mackinaw,
-    tier: 'Tier 4 · Exhumer Tech II',
+    shipClass: 'Exhumer',
+    tier: 'Exhumer · Tech II',
     role: 'Resistencia Autárquica & Bodega Gigante',
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
@@ -174,7 +196,8 @@ export const SHIPS_CATALOG: ShipItem[] = [
   {
     name: 'Hulk',
     typeId: SHIP_TYPE_IDS.Hulk,
-    tier: 'Tier 4 · Exhumer Tech II',
+    shipClass: 'Exhumer',
+    tier: 'Exhumer · Tech II',
     role: 'Élite de Extracción Industrial',
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
@@ -187,30 +210,64 @@ export const SHIPS_CATALOG: ShipItem[] = [
     nullsecNote: 'Requiere flota organizada y compresión continua en campo.',
   },
   {
-    name: 'Porpoise / Orca / Rorqual',
-    typeId: SHIP_TYPE_IDS.Orca,
-    secondaryHulls: [
-      { name: 'Porpoise', typeId: SHIP_TYPE_IDS.Porpoise },
-      { name: 'Orca', typeId: SHIP_TYPE_IDS.Orca },
-      { name: 'Rorqual', typeId: SHIP_TYPE_IDS.Rorqual },
-    ],
-    tier: 'Tier 5 · Mando Industrial & Capital',
-    role: 'Boosts de Flota, Compresión & PANIC',
+    name: 'Porpoise',
+    typeId: SHIP_TYPE_IDS.Porpoise,
+    shipClass: 'Industrial Command Ship',
+    tier: 'Industrial Command Ship · Ligera',
+    role: 'Boosts Móviles, Compresión en Campo & Wormholes',
     clone: 'omega',
     cloneLabel: 'SOLO OMEGA',
-    cargo: '50,000 m³ – 300,000+ m³ (Bodega Flota/Mineral)',
+    cargo: '50,000 m³ (Mineral) + 5,000 m³ (Fleet Hangar)',
     bonuses: [
-      'Command Bursts: reducen ciclo de láser, aumentan alcance y reducen residuo',
-      'Compresión en el espacio (reducen el volumen del mineral hasta un 99%)',
-      'Rorqual: Módulo PANIC (invulnerabilidad temporal de flota) y drones Excavator',
+      'Command Bursts industriales: reducen ciclo de láser, amplían alcance y bajan residuo',
+      'Compact Industrial Core: comprime mineral, hielo y gas directamente en el cinturón',
+      'Alineamiento ágil, coste contenido (~100M–150M ISK) y masa apta para Wormholes',
     ],
-    requirements: 'Industrial Command Ships / Capital Industrial Ships',
-    nullsecNote: 'Porpoise es ideal por agilidad y coste; Rorqual requiere paraguas capital aliado.',
+    requirements: 'Industrial Command Ships I + Mining Foreman IV',
+    nullsecNote:
+      'El estándar de mando en Null-Sec y J-Space: se repone rápido y no queda atrapada tanto tiempo como una Orca.',
+  },
+  {
+    name: 'Orca',
+    typeId: SHIP_TYPE_IDS.Orca,
+    shipClass: 'Industrial Command Ship',
+    tier: 'Industrial Command Ship · Pesada',
+    role: 'Base Móvil de Flota, Almacén & Boosts Pesados',
+    clone: 'omega',
+    cloneLabel: 'SOLO OMEGA',
+    cargo: '187,500 m³ (Mineral) + 40,000 m³ (Fleet) + 400,000 m³ (Ship Bay)',
+    bonuses: [
+      'Boosts de Mining Foreman superiores a la Porpoise mediante Large Industrial Core',
+      'Ship Maintenance Bay (400,000 m³) para refittear y transportar barcazas o fragatas en campo',
+      'Compresión en el espacio de mineral, hielo y gas con enorme tanqueo de escudo',
+    ],
+    requirements: 'Industrial Command Ships I (rec. IV–V) + Mining Director',
+    nullsecNote:
+      'Reina de High-Sec y flotas estables; en Null-Sec hostil su alineamiento lento y coste (~2B+ ISK) la convierten en objetivo prioritario.',
+  },
+  {
+    name: 'Rorqual',
+    typeId: SHIP_TYPE_IDS.Rorqual,
+    shipClass: 'Capital Industrial Ship',
+    tier: 'Capital Industrial Ship · Capital',
+    role: 'Mando Capital, Módulo PANIC & Drones Excavator',
+    clone: 'omega',
+    cloneLabel: 'SOLO OMEGA',
+    cargo: '300,000 m³ (Mineral) + 40,000 m³ (Fleet) + 1,000,000 m³ (Ship Bay)',
+    bonuses: [
+      'Los Command Bursts mineros más potentes del juego y compresión masiva de flota',
+      'Módulo PANIC: otorga invulnerabilidad temporal a toda la flota minera hasta que lleguen refuerzos',
+      'Jump Drive (salto por cyno) y drones de extracción Excavator de rendimiento capital',
+    ],
+    requirements: 'Capital Industrial Ships I + Industrial Reconfiguration + Jump Drive Operation',
+    nullsecNote:
+      'Solo viable bajo un paraguas capital aliado (Supercapital Umbrella) con cyno de respuesta inmediato.',
   },
   {
     name: 'Miasmos',
     typeId: SHIP_TYPE_IDS.Miasmos,
-    tier: 'Logística · Carguero Industrial Gallente',
+    shipClass: 'Hauler / Logística',
+    tier: 'Hauler Industrial · Gallente',
     role: 'Transporte Masivo de Mineral Crudo',
     clone: 'alpha-omega',
     cloneLabel: 'ALPHA & OMEGA',
@@ -220,6 +277,25 @@ export const SHIPS_CATALOG: ShipItem[] = [
       'Acceso total para cuentas Alpha con mínimo entrenamiento',
     ],
     requirements: 'Gallente Industrial I (recomendado IV)',
-    nullsecNote: 'Indispensable para mover mineral sin comprimir entre estaciones o hacia centros de reprocesado.',
+    nullsecNote:
+      'Indispensable para mover mineral sin comprimir entre estaciones o hacia centros de reprocesado.',
+  },
+  {
+    name: 'Bowhead',
+    typeId: SHIP_TYPE_IDS.Bowhead,
+    shipClass: 'Hauler / Logística',
+    tier: 'Freighter ORE · Transporte de Naves',
+    role: 'Traslado de Flotas Ensambladas & Fittings',
+    clone: 'omega',
+    cloneLabel: 'SOLO OMEGA',
+    cargo: '1,300,000 m³ – 1,625,000 m³ (Ship Maintenance Bay)',
+    bonuses: [
+      '+5% capacidad de Ship Maintenance Bay y velocidad de agilidad por nivel de ORE Freighter',
+      'Transporta múltiples barcazas, Exhumers y fragatas ya ensambladas y equipadas',
+      'Permite refittear naves aliadas en espacio y cuenta con slots de escudo para tanqueo',
+    ],
+    requirements: 'ORE Freighter I (Advanced Spaceship Command V)',
+    nullsecNote:
+      'Orientada a logística en High-Sec o rutas seguras; en Low/Null-Sec es extremadamente vulnerable a ganks e interdictores sin escolta ni webs.',
   },
 ];

@@ -142,6 +142,7 @@ export function getModuleSearchMatches(
     (ship) =>
       matchesClone(ship.clone, cloneFilter) &&
       (ship.name.toLowerCase().includes(q) ||
+        ship.shipClass.toLowerCase().includes(q) ||
         ship.tier.toLowerCase().includes(q) ||
         ship.role.toLowerCase().includes(q) ||
         ship.requirements.toLowerCase().includes(q) ||

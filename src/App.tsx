@@ -198,16 +198,17 @@ export function App() {
     const query = searchQuery.trim().toLowerCase();
     return SHIPS_CATALOG.filter((ship) => {
       const cloneOk = matchesClone(ship.clone, cloneFilter);
-      const tierOk = shipTierFilter === 'ALL' || ship.tier.includes(shipTierFilter);
+      const classOk = shipTierFilter === 'ALL' || ship.shipClass === shipTierFilter;
       const queryOk =
         !query ||
         ship.name.toLowerCase().includes(query) ||
+        ship.shipClass.toLowerCase().includes(query) ||
         ship.tier.toLowerCase().includes(query) ||
         ship.role.toLowerCase().includes(query) ||
         ship.requirements.toLowerCase().includes(query) ||
         ship.bonuses.some((b) => b.toLowerCase().includes(query)) ||
         ship.nullsecNote.toLowerCase().includes(query);
-      return cloneOk && tierOk && queryOk;
+      return cloneOk && classOk && queryOk;
     });
   }, [cloneFilter, shipTierFilter, searchQuery]);
 

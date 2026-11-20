@@ -15,7 +15,6 @@ export function ShipHullPreview({
   name,
   size = 'lg',
   secondaryHulls,
-  visualMode = 'dossier',
 }: ShipHullPreviewProps) {
   const hulls = secondaryHulls && secondaryHulls.length > 0 ? secondaryHulls : [{ name, typeId }];
   const defaultIndex = Math.max(
@@ -33,7 +32,7 @@ export function ShipHullPreview({
 
   const boxSize = size === 'lg' ? 'w-20 h-20 sm:w-24 sm:h-24' : 'w-14 h-14';
   const imgDim = size === 'lg' ? 96 : 56;
-  const frameRadius = visualMode === 'dossier' ? 'rounded-md' : 'rounded-lg';
+  const frameRadius = size === 'lg' ? 'rounded-2xl' : 'rounded-xl';
 
   const handleSelectHull = (idx: number) => {
     if (idx === selectedIndex) return;
@@ -48,12 +47,8 @@ export function ShipHullPreview({
   return (
     <div className="flex flex-col items-start gap-2 shrink-0">
       <div
-        className={`relative ${boxSize} aspect-square ${frameRadius} border border-zinc-800/90 bg-[#070709] overflow-hidden flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}
+        className={`relative ${boxSize} aspect-square ${frameRadius} bg-[#070709] overflow-hidden flex items-center justify-center ring-1 ring-zinc-700/80 shadow-md`}
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.10)_0%,rgba(9,9,11,0)_72%)] pointer-events-none"
-        />
         {imageStage === 'fallback' ? (
           <Rocket className="w-6 h-6 text-zinc-400 relative z-10" aria-hidden="true" />
         ) : (
@@ -65,11 +60,13 @@ export function ShipHullPreview({
             loading="lazy"
             decoding="async"
             onError={handleImageError}
-            className={`relative z-10 w-full h-full object-contain ${
-              size === 'lg' ? 'p-1' : 'p-0.5'
-            } transition-transform duration-300 group-hover:scale-105`}
+            className="block w-full h-full object-cover rounded-[inherit] transition-transform duration-300 group-hover:scale-105"
           />
         )}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/10"
+        />
       </div>
 
       {size === 'lg' && (
