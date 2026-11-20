@@ -20,7 +20,15 @@ export function Footer() {
           </span>
         </div>
         <p className="text-zinc-400">
-          Hecho por <span className="text-amber-400 font-semibold">@S3rmulu</span>
+          Hecho por{' '}
+          <a
+            href="https://github.com/S3rmulu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-400 hover:text-amber-300 font-semibold underline-offset-4 hover:underline transition-colors"
+          >
+            @S3rmulu
+          </a>
         </p>
       </div>
     </footer>
