@@ -1,6 +1,7 @@
 import { AlertCircle, Check, Copy, RotateCcw } from 'lucide-react';
 import { FittingItem, VisualMode } from '../../../types';
 import { ShipHullPreview } from '../../../components/ui/ShipHullPreview';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { getCloneBadgeClasses } from '../../../components/ui/cloneBadges';
 
 interface FittingsSectionProps {
@@ -58,10 +59,13 @@ export function FittingsSection({
           {fittings.map((fit) => {
             const isCopied = copiedId === fit.id;
             const hasError = copyErrorId === fit.id;
+            const spotlightTone =
+              fit.clone === 'omega' ? 'amber' : fit.clone === 'alpha-expert' ? 'sky' : 'emerald';
             return (
-              <article
+              <SpotlightCard
                 key={fit.id}
-                className={`wiki-card-container group border border-zinc-800 bg-zinc-950 p-4 sm:p-5 flex flex-col justify-between gap-4 hover:border-zinc-700 transition-colors ${
+                tone={spotlightTone}
+                className={`wiki-card-container group border border-zinc-800 bg-zinc-950 p-4 sm:p-5 hover:border-zinc-700 transition-colors ${
                   visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
                 }`}
               >
@@ -152,7 +156,7 @@ export function FittingsSection({
                     </>
                   )}
                 </button>
-              </article>
+              </SpotlightCard>
             );
           })}
         </div>

@@ -46,6 +46,25 @@
     outline-offset: 2px;
   }
 
+  :where(button, a[role='button'], .tactical-btn) {
+    transition:
+      box-shadow 150ms ease-out,
+      scale 150ms ease-out,
+      background-color 150ms ease-out,
+      border-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  :where(button, a[role='button'], .tactical-btn):active {
+    scale: 0.98;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(button, a[role='button'], .tactical-btn):active {
+      scale: 1;
+    }
+  }
+
   :where(
     button:not(.compact-control),
     select,
@@ -206,3 +225,62 @@
     }
   }
 }
+
+/* 21st.dev Interactive Content Reveal / Spotlight Card */
+@property --spotlight-inner {
+  syntax: '<length-percentage>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --spotlight-outer {
+  syntax: '<length-percentage>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+.spotlight-card {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+
+.spotlight-card:hover {
+  --spotlight-inner: 90px;
+  --spotlight-outer: 240px;
+}
+
+.spotlight-reveal-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--spotlight-fill, rgba(245, 158, 11, 0.11)),
+    transparent 70%
+  );
+  box-shadow: inset 0 0 0 1px var(--spotlight-border, rgba(251, 191, 36, 0.4));
+  transition:
+    --spotlight-inner 0.22s ease-in-out,
+    --spotlight-outer 0.22s ease-in-out;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black var(--spotlight-inner, 0%),
+    transparent var(--spotlight-outer, 0%)
+  );
+  mask-image: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black var(--spotlight-inner, 0%),
+    transparent var(--spotlight-outer, 0%)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-reveal-layer {
+    transition: none !important;
+  }
+}
+

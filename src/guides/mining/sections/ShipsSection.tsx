@@ -1,6 +1,7 @@
 import { ChevronRight, RotateCcw } from 'lucide-react';
 import { ShipItem, VisualMode } from '../../../types';
 import { ShipHullPreview } from '../../../components/ui/ShipHullPreview';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { getCloneBadgeClasses } from '../../../components/ui/cloneBadges';
 import { getMiningModuleHref } from '../../../router/useHashRoute';
 import { FITTINGS_LIST, SHIP_CLASSES_ORDER } from '../data';
@@ -105,10 +106,17 @@ export function ShipsSection({
                       const shipFittingsCount = FITTINGS_LIST.filter(
                         (f) => f.ship === ship.name
                       ).length;
+                      const spotlightTone =
+                        ship.clone === 'omega'
+                          ? 'amber'
+                          : ship.clone === 'alpha-expert'
+                          ? 'sky'
+                          : 'emerald';
                       return (
-                        <article
+                        <SpotlightCard
                           key={ship.name}
-                          className={`wiki-card-container group border border-zinc-800 bg-zinc-950 p-4 sm:p-5 flex flex-col justify-between gap-4 hover:border-zinc-700 transition-colors ${
+                          tone={spotlightTone}
+                          className={`wiki-card-container group border border-zinc-800 bg-zinc-950 p-4 sm:p-5 hover:border-zinc-700 transition-colors ${
                             visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
                           }`}
                         >
@@ -204,7 +212,7 @@ export function ShipsSection({
                               </div>
                             )}
                           </div>
-                        </article>
+                        </SpotlightCard>
                       );
                     })}
                   </div>
