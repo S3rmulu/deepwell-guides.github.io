@@ -1,5 +1,7 @@
 export type CloneFilter = 'all' | 'alpha' | 'expert' | 'omega';
 
+export type GuideId = 'mining';
+
 export type GuideModuleId =
   | 'overview'
   | 'mechanics'
@@ -8,6 +10,17 @@ export type GuideModuleId =
   | 'nullsec'
   | 'specialties'
   | 'fittings';
+
+export type WikiRoute =
+  | { view: 'hub' }
+  | { view: 'guide'; guideId: GuideId; moduleId: GuideModuleId };
+
+export interface GuideModuleMeta {
+  id: GuideModuleId;
+  slug: string;
+  label: string;
+  shortLabel: string;
+}
 
 export interface GuideCardItem {
   id: string;
