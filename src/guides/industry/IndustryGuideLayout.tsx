@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeft, Search, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Search, User, X } from 'lucide-react';
 import { RefObject } from 'react';
 import {
   CloneFilter,
@@ -14,11 +14,21 @@ import {
   MobileModuleDrawerHandle,
 } from '../../components/layout/MobileModuleDrawer';
 import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
-import { INDUSTRY_GROUP_ORDER, INDUSTRY_GUIDE_TITLE, INDUSTRY_MODULES } from './index';
+import {
+  INDUSTRY_GROUP_ORDER,
+  INDUSTRY_GUIDE_AUTHOR,
+  INDUSTRY_GUIDE_TITLE,
+  INDUSTRY_MODULES,
+} from './index';
 import { IndustryOverviewSection } from './sections/IndustryOverviewSection';
 import { BlueprintsSection } from './sections/BlueprintsSection';
-import { WorkflowSection } from './sections/WorkflowSection';
+import { T1ManufacturingSection } from './sections/T1ManufacturingSection';
+import { LogisticsSection } from './sections/LogisticsSection';
 import { EconomySection } from './sections/EconomySection';
+import { WorkflowSection } from './sections/WorkflowSection';
+import { ReactionsSection } from './sections/ReactionsSection';
+import { AllianceSection } from './sections/AllianceSection';
+import { ToolsSection } from './sections/ToolsSection';
 import { IndustrySkillsSection } from './sections/IndustrySkillsSection';
 
 interface IndustryGuideLayoutProps {
@@ -81,9 +91,16 @@ export function IndustryGuideLayout({
             Industria, Planos (BPO/BPC), Invención T2 & <span className="text-amber-400">Economía</span>
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400">
-            Manual modular de cadena de valor industrial: investigación ME/TE, System Cost Index,
-            Invención Tech II y punto de equilibrio en el mercado.
+            Manual modular desde conceptos base y blueprints hasta fabricación T1, logística,
+            invención Tech II, reacciones, alianza y herramientas.
           </p>
+        </div>
+
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/35 bg-amber-500/10 text-xs text-zinc-200 self-start sm:self-center shrink-0">
+          <User className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+          <span>
+            Guía creada por <strong className="text-amber-300">{INDUSTRY_GUIDE_AUTHOR}</strong>
+          </span>
         </div>
       </div>
 
@@ -97,7 +114,7 @@ export function IndustryGuideLayout({
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" aria-hidden="true" />
             <span>
               No existe el capítulo <code className="text-amber-300">{invalidSlug}</code>. Mostrando{' '}
-              <strong>0. Visión General & Flujo</strong>.
+              <strong>{INDUSTRY_MODULES[0].label}</strong>.
             </span>
           </div>
           <button
@@ -121,7 +138,7 @@ export function IndustryGuideLayout({
           <div className="flex flex-wrap items-center gap-2 text-zinc-300">
             <Search className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
             <span>
-              Coincidencias para <strong className="text-amber-300">"{searchQuery}"</strong>:
+              Coincidencias para <strong className="text-amber-300">&quot;{searchQuery}&quot;</strong>:
             </span>
             {otherModuleMatches.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
@@ -231,9 +248,17 @@ export function IndustryGuideLayout({
               onResetSearch={onResetSearch}
             />
           )}
-          {activeModule === 'workflow' && (
-            <WorkflowSection
+          {activeModule === 't1' && (
+            <T1ManufacturingSection
+              products={products}
               cloneFilter={cloneFilter}
+              searchQuery={searchQuery}
+              visualMode={visualMode}
+              onResetSearch={onResetSearch}
+            />
+          )}
+          {activeModule === 'logistics' && (
+            <LogisticsSection
               searchQuery={searchQuery}
               visualMode={visualMode}
               onResetSearch={onResetSearch}
@@ -246,9 +271,38 @@ export function IndustryGuideLayout({
               onResetSearch={onResetSearch}
             />
           )}
+          {activeModule === 'workflow' && (
+            <WorkflowSection
+              cloneFilter={cloneFilter}
+              searchQuery={searchQuery}
+              visualMode={visualMode}
+              onResetSearch={onResetSearch}
+            />
+          )}
+          {activeModule === 'reactions' && (
+            <ReactionsSection
+              cloneFilter={cloneFilter}
+              searchQuery={searchQuery}
+              visualMode={visualMode}
+              onResetSearch={onResetSearch}
+            />
+          )}
+          {activeModule === 'alliance' && (
+            <AllianceSection
+              searchQuery={searchQuery}
+              visualMode={visualMode}
+              onResetSearch={onResetSearch}
+            />
+          )}
+          {activeModule === 'tools' && (
+            <ToolsSection
+              searchQuery={searchQuery}
+              visualMode={visualMode}
+              onResetSearch={onResetSearch}
+            />
+          )}
           {activeModule === 'skills' && (
             <IndustrySkillsSection
-              products={products}
               skills={skills}
               cloneFilter={cloneFilter}
               searchQuery={searchQuery}

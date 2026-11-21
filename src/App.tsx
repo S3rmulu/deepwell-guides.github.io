@@ -5,7 +5,13 @@ import { PORTAL_GUIDES } from './data/portalGuides';
 import { FITTINGS_LIST, SHIPS_CATALOG, SKILLS_BIBLE } from './guides/mining/data';
 import { getModuleSearchMatches } from './guides/mining/searchIndex';
 import { INDUSTRY_SKILLS_BIBLE, STARTER_PRODUCTS } from './guides/industry/data';
-import { getIndustrySearchMatches } from './guides/industry/searchIndex';
+import {
+  getIndustrySearchMatches,
+  matchesIndustrySkillQuery,
+  matchesStarterProductQuery,
+  MODULE_SEARCH_KEYWORDS,
+  normalizeSearch,
+} from './guides/industry/searchIndex';
 import { matchesClone } from './components/ui/cloneBadges';
 import { Header } from './components/layout/Header';
 import { MobileControlsBar } from './components/layout/MobileControlsBar';
@@ -182,7 +188,7 @@ export function App() {
   }, []);
 
   const filteredGuides = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = normalizeSearch(searchQuery);
     return PORTAL_GUIDES.filter((g) => {
       const cloneOk =
         cloneFilter === 'all' ||
@@ -190,9 +196,10 @@ export function App() {
         (cloneFilter === 'omega' && g.cloneAccess === 'omega');
       const queryOk =
         !query ||
-        g.title.toLowerCase().includes(query) ||
-        g.summary.toLowerCase().includes(query) ||
-        g.tags.some((t) => t.toLowerCase().includes(query));
+        normalizeSearch(g.title).includes(query) ||
+        normalizeSearch(g.summary).includes(query) ||
+        (g.author ? normalizeSearch(g.author).includes(query) : false) ||
+        g.tags.some((t) => normalizeSearch(t).includes(query));
       return cloneOk && queryOk;
     });
   }, [cloneFilter, searchQuery]);
@@ -244,31 +251,27 @@ export function App() {
   }, [cloneFilter, searchQuery]);
 
   const filteredIndustryProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return STARTER_PRODUCTS.filter((prod) => {
-      const cloneOk = matchesClone(prod.clone, cloneFilter);
-      const queryOk =
-        !query ||
-        prod.category.toLowerCase().includes(query) ||
-        prod.rotationNote.toLowerCase().includes(query) ||
-        prod.upgradePath.toLowerCase().includes(query) ||
-        prod.items.some((it) => it.name.toLowerCase().includes(query));
-      return cloneOk && queryOk;
-    });
+    const query = normalizeSearch(searchQuery);
+    return STARTER_PRODUCTS.filter(
+      (prod) => matchesClone(prod.clone, cloneFilter) && matchesStarterProductQuery(prod, query)
+    );
   }, [cloneFilter, searchQuery]);
 
   const filteredIndustrySkills = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return INDUSTRY_SKILLS_BIBLE.filter((skill) => {
-      const cloneOk = matchesClone(skill.clone, cloneFilter);
-      const queryOk =
-        !query ||
-        skill.name.toLowerCase().includes(query) ||
-        skill.category.toLowerCase().includes(query) ||
-        skill.effect.toLowerCase().includes(query);
-      return cloneOk && queryOk;
-    });
+    const query = normalizeSearch(searchQuery);
+    return INDUSTRY_SKILLS_BIBLE.filter(
+      (skill) => matchesClone(skill.clone, cloneFilter) && matchesIndustrySkillQuery(skill, query)
+    );
   }, [cloneFilter, searchQuery]);
+
+  const bannerIndustrySkillsCount = useMemo(() => {
+    if (filteredIndustrySkills.length > 0) return filteredIndustrySkills.length;
+    const query = normalizeSearch(searchQuery);
+    if (query && MODULE_SEARCH_KEYWORDS.skills.includes(query)) {
+      return INDUSTRY_SKILLS_BIBLE.filter((skill) => matchesClone(skill.clone, cloneFilter)).length;
+    }
+    return 0;
+  }, [cloneFilter, filteredIndustrySkills.length, searchQuery]);
 
   const miningMatchCounts = useMemo(
     () => getModuleSearchMatches(searchQuery, cloneFilter),
@@ -329,7 +332,7 @@ export function App() {
         skillsCount={filteredSkills.length}
         fittingsCount={filteredFittings.length}
         industryProductsCount={filteredIndustryProducts.length}
-        industrySkillsCount={filteredIndustrySkills.length}
+        industrySkillsCount={bannerIndustrySkillsCount}
         onReset={() => handleCloneFilterChange('all')}
       />
 

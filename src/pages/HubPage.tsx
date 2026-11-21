@@ -1,4 +1,4 @@
-import { ChevronRight, RotateCcw, Sparkles } from 'lucide-react';
+import { ChevronRight, RotateCcw, Sparkles, User } from 'lucide-react';
 import { GuideCardItem, VisualMode } from '../types';
 import { getIndustryModuleHref, getMiningModuleHref } from '../router/useHashRoute';
 import { SpotlightCard } from '@/components/ui/SpotlightCard';
@@ -21,9 +21,9 @@ function getGuideQuickLinks(guideId: string): { id: string; label: string; href:
   if (guideId === 'industry-reactions') {
     return [
       { id: 'blueprints', label: 'Planos, ME/TE & SCI', href: getIndustryModuleHref('blueprints') },
-      { id: 'workflow', label: 'Invención Tech II', href: getIndustryModuleHref('workflow') },
-      { id: 'economy', label: 'Break-Even & Impuestos', href: getIndustryModuleHref('economy') },
-      { id: 'skills', label: 'Productos & Skills', href: getIndustryModuleHref('skills') },
+      { id: 't1', label: 'Fabricación T1', href: getIndustryModuleHref('t1') },
+      { id: 'reactions', label: 'Reacciones & Moon Goo', href: getIndustryModuleHref('reactions') },
+      { id: 'tools', label: 'Herramientas & Enlaces', href: getIndustryModuleHref('tools') },
     ];
   }
   return [
@@ -105,6 +105,14 @@ export function HubPage({ guides, visualMode, onResetFilters }: HubPageProps) {
                       <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
                         MANUAL ACTIVO · {guide.readTime} · {guide.updatedAt}
                       </span>
+                      {guide.author && (
+                        <span className="inline-flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-200 border border-zinc-700">
+                          <User className="w-3 h-3 text-amber-400 shrink-0" aria-hidden="true" />
+                          <span>
+                            Guía creada por <strong className="text-amber-300">{guide.author}</strong>
+                          </span>
+                        </span>
+                      )}
                     </div>
                     <h2 className="text-xl sm:text-2xl font-bold text-zinc-100">{guide.title}</h2>
                     <p className="text-sm text-zinc-300 leading-relaxed">{guide.summary}</p>
@@ -201,6 +209,14 @@ export function HubPage({ guides, visualMode, onResetFilters }: HubPageProps) {
                 </div>
 
                 <h2 className="text-lg sm:text-xl font-bold text-zinc-100">{guide.title}</h2>
+                {guide.author && (
+                  <div className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md bg-zinc-950 text-zinc-200 border border-zinc-800">
+                    <User className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+                    <span>
+                      Guía creada por <strong className="text-amber-300">{guide.author}</strong>
+                    </span>
+                  </div>
+                )}
                 <p className="text-sm text-zinc-300 leading-relaxed">{guide.summary}</p>
 
                 <div className="flex flex-wrap gap-1.5 pt-1">

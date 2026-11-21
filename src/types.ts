@@ -7,8 +7,9 @@ export type GuideId = 'mining' | 'industry';
 export type MiningModuleGroup = 'Fundamentos' | 'Flota & Skills' | 'Operaciones & Fittings';
 export type IndustryModuleGroup =
   | 'Fundamentos & Planos'
-  | 'Producción & Economía'
-  | 'Estrategia & Habilidades';
+  | 'Producción & Logística'
+  | 'Escala T2, Reacciones & Alianza'
+  | 'Herramientas & Habilidades';
 
 export type ModuleGroup = MiningModuleGroup | IndustryModuleGroup;
 
@@ -21,7 +22,17 @@ export type MiningModuleId =
   | 'specialties'
   | 'fittings';
 
-export type IndustryModuleId = 'overview' | 'blueprints' | 'workflow' | 'economy' | 'skills';
+export type IndustryModuleId =
+  | 'overview'
+  | 'blueprints'
+  | 't1'
+  | 'logistics'
+  | 'economy'
+  | 'workflow'
+  | 'reactions'
+  | 'alliance'
+  | 'tools'
+  | 'skills';
 
 export type GuideModuleId = MiningModuleId | IndustryModuleId;
 
@@ -41,6 +52,7 @@ export interface GuideModuleMeta<TId extends string = GuideModuleId> {
 export interface GuideCardItem {
   id: string;
   title: string;
+  author?: string;
   category: string;
   status: 'active' | 'coming-soon';
   cloneAccess: 'alpha-omega' | 'omega';

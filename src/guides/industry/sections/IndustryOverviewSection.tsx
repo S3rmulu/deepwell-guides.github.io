@@ -1,14 +1,22 @@
 import {
   AlertTriangle,
   ArrowDown,
+  BookOpen,
   ChevronRight,
+  ExternalLink,
   GitFork,
   Layers,
   RotateCcw,
   Sparkles,
 } from 'lucide-react';
-import { CloneFilter, VisualMode } from '../../../types';
+import { CloneFilter, IndustryModuleId, VisualMode } from '../../../types';
 import { getIndustryModuleHref } from '../../../router/useHashRoute';
+import {
+  INDUSTRY_BASE_CONCEPTS,
+  INDUSTRY_LIBRARY_INTRO,
+  INDUSTRY_LIBRARY_LINKS,
+} from '../data';
+import { MODULE_SEARCH_KEYWORDS, normalizeSearch } from '../searchIndex';
 
 interface IndustryOverviewSectionProps {
   cloneFilter: CloneFilter;
@@ -17,25 +25,76 @@ interface IndustryOverviewSectionProps {
   onResetSearch: () => void;
 }
 
+const CHAPTER_SHORTCUTS: {
+  id: IndustryModuleId;
+  step: string;
+  title: string;
+  desc: string;
+}[] = [
+  {
+    id: 'blueprints',
+    step: 'Capítulo 1',
+    title: 'Blueprints, ME/TE & SCI',
+    desc: 'BPO vs BPC, investigación, cuándo esperar y simulador de materiales.',
+  },
+  {
+    id: 't1',
+    step: 'Capítulo 2',
+    title: 'Fabricación T1',
+    desc: 'Primeros lotes, qué mirar antes de producir y productos de rotación.',
+  },
+  {
+    id: 'logistics',
+    step: 'Capítulo 3',
+    title: 'Reprocesado & Logística',
+    desc: 'Coste real del mineral, compresión, hauling, collateral y stock.',
+  },
+  {
+    id: 'economy',
+    step: 'Capítulo 4',
+    title: 'Economía & Break-Even',
+    desc: 'Sales Tax, Broker Fee y calculadora de punto de equilibrio.',
+  },
+  {
+    id: 'workflow',
+    step: 'Capítulo 5',
+    title: 'Invención & Producción T2',
+    desc: 'Probabilidad promedio, datacores, decryptors y paso a T2.',
+  },
+  {
+    id: 'reactions',
+    step: 'Capítulo 6',
+    title: 'Reacciones & Moon Goo',
+    desc: 'Composite, Biochemical, Hybrid T3 y cadenas avanzadas.',
+  },
+  {
+    id: 'alliance',
+    step: 'Capítulo 7',
+    title: 'Industria de Alianza',
+    desc: 'Buyback, contratos internos, doctrina y precios pactados.',
+  },
+  {
+    id: 'tools',
+    step: 'Capítulo 8',
+    title: 'Herramientas & Enlaces',
+    desc: 'Calculadoras, mercados, valoración y directorio de guías.',
+  },
+];
+
 export function IndustryOverviewSection({
   cloneFilter,
   searchQuery,
   visualMode,
   onResetSearch,
 }: IndustryOverviewSectionProps) {
-  const q = searchQuery.trim().toLowerCase();
-
-  const matchesOverview =
-    !q ||
-    'flujo industrial materias primas minerales pi gas reacciones planos blueprints bpo bpc investigacion me te fabricacion tech i invencion tech ii datacores decryptors producto final venta distribucion hub jita dodixie amarr alpha omega recargo 2%'.includes(
-      q
-    );
+  const q = normalizeSearch(searchQuery);
+  const matchesOverview = !q || MODULE_SEARCH_KEYWORDS.overview.includes(q);
 
   if (!matchesOverview) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 sm:p-8 text-center space-y-3">
         <p className="text-sm font-semibold text-zinc-200">
-          No hay coincidencias en Visión General del Flujo Industrial para "{searchQuery}".
+          No hay coincidencias en Índice & Conceptos Base para &quot;{searchQuery}&quot;.
         </p>
         <p className="text-xs sm:text-sm text-zinc-400">
           Revisa los contadores en los demás capítulos de la guía o limpia el buscador.
@@ -54,22 +113,149 @@ export function IndustryOverviewSection({
 
   return (
     <div className="space-y-5 sm:space-y-6">
-      {/* BLOQUE 1: VISIÓN GENERAL Y DIAGRAMA DEL FLUJO INDUSTRIAL */}
+      {/* BLOQUE 00: BIBLIOTECA DE INDUSTRIA Y ENLACES RÁPIDOS */}
+      <div
+        className={`border border-zinc-800 bg-zinc-900/60 p-4 sm:p-6 space-y-5 ${
+          visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="space-y-1.5">
+            <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
+              <span>Biblioteca de Industria / Producción</span>
+            </h2>
+            <p className="text-sm text-zinc-300 leading-relaxed">{INDUSTRY_LIBRARY_INTRO}</p>
+          </div>
+          <a
+            href={getIndustryModuleHref('tools')}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 shrink-0"
+          >
+            <span>Directorio completo</span>
+            <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-2.5">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+              Oficial / base
+            </h3>
+            <ul className="space-y-2">
+              {INDUSTRY_LIBRARY_LINKS.oficialBase.map((link) => (
+                <li key={link.url}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-start gap-1.5 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
+                  >
+                    <ExternalLink
+                      className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
+                    <span className="underline decoration-zinc-700 group-hover:decoration-amber-400">
+                      {link.label}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-2.5">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+              Guías principales
+            </h3>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2">
+              {INDUSTRY_LIBRARY_LINKS.guiasPrincipales.map((link) => (
+                <li key={link.url}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-start gap-1.5 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
+                  >
+                    <ExternalLink
+                      className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
+                    <span className="underline decoration-zinc-700 group-hover:decoration-amber-400">
+                      {link.label}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-2.5">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+              Herramientas
+            </h3>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2">
+              {INDUSTRY_LIBRARY_LINKS.herramientas.map((link) => (
+                <li key={link.url}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-start gap-1.5 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
+                  >
+                    <ExternalLink
+                      className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
+                    <span className="underline decoration-zinc-700 group-hover:decoration-amber-400">
+                      {link.label}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* BLOQUE 01: CONCEPTOS BASE — QUÉ ESTÁS PAGANDO REALMENTE */}
       <div
         className={`border border-zinc-800 bg-zinc-900/60 p-4 sm:p-6 space-y-5 ${
           visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
         }`}
       >
         <div className="space-y-2">
-          <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-zinc-100 flex items-center gap-2">
             <GitFork className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
-            <span>Módulo 0: Visión General del Flujo Industrial</span>
-          </h2>
+            <span>Qué estás pagando realmente</span>
+          </h3>
           <p className="text-sm text-zinc-300 leading-relaxed">
-            La industria en New Eden transforma recursos primarios en bienes terminados mediante{' '}
-            <strong>Planos (Blueprints)</strong> e instalaciones industriales. Este manual cubre
-            toda la cadena de valor: adquisición e investigación de planos originales, invención y
-            fabricación Tech II, costes de instalación (SCI) e impuestos de mercado.
+            Fabricar no es convertir minerales en ISK gratis. Cada job tiene coste, tiempo,
+            impuestos, materiales, riesgo de mercado y coste de oportunidad.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+            Conceptos clave
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {INDUSTRY_BASE_CONCEPTS.map((item) => (
+              <div
+                key={item.term}
+                className="rounded-lg border border-zinc-800 bg-zinc-950 p-3.5 space-y-1"
+              >
+                <div className="text-xs font-mono font-bold text-amber-300">{item.term}</div>
+                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-xs sm:text-sm font-bold text-amber-200 leading-relaxed">
+            Si no has calculado coste total, precio de venta y volumen vendido, no estás fabricando:
+            estás apostando con pasos extra.
           </p>
         </div>
 
@@ -91,7 +277,6 @@ export function IndustryOverviewSection({
           </figcaption>
 
           <div className="max-w-3xl mx-auto space-y-3">
-            {/* Etapa 1: Materias Primas */}
             <div className="rounded-lg border border-zinc-700 bg-zinc-900/80 p-3.5 text-center space-y-1">
               <div className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold">
                 1. Materias Primas
@@ -105,7 +290,6 @@ export function IndustryOverviewSection({
               <ArrowDown className="w-4 h-4 text-amber-400" />
             </div>
 
-            {/* Etapa 2: Planos (Blueprints) */}
             <div className="rounded-xl border border-amber-500/40 bg-zinc-900/40 p-4 space-y-3">
               <div className="text-center">
                 <span className="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold">
@@ -143,9 +327,7 @@ export function IndustryOverviewSection({
               <ArrowDown className="w-4 h-4 text-amber-400" />
             </div>
 
-            {/* Etapa 3: Bifurcación T1 vs Invención T2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-              {/* Rama Izquierda: Tech I */}
               <div className="rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 flex flex-col justify-between space-y-3">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
@@ -153,10 +335,10 @@ export function IndustryOverviewSection({
                       Vía Tech I (Alpha & Omega)
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-zinc-100">Fabricación Directa Tech I</h3>
+                  <h4 className="text-sm font-bold text-zinc-100">Fabricación Directa Tech I</h4>
                   <p className="text-xs text-zinc-300 leading-relaxed">
                     Ensamblaje directo desde el BPO o BPC T1 usando minerales estándar (Tritanium a
-                    Megacyte). Ideal para aprender a rotar stock y abastecer hubs.
+                    Megacyte). Sirve para aprender a rotar stock y abastecer hubs.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-zinc-800 text-[11px] font-mono text-zinc-400 flex items-center justify-between">
@@ -165,7 +347,6 @@ export function IndustryOverviewSection({
                 </div>
               </div>
 
-              {/* Rama Derecha: Tech II */}
               <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 p-4 flex flex-col justify-between space-y-3">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
@@ -173,16 +354,15 @@ export function IndustryOverviewSection({
                       Vía Tech II (Solo Omega)
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-amber-300">
+                  <h4 className="text-sm font-bold text-amber-300">
                     Invención (Invention) T2 + Datacores + Decryptors
-                  </h3>
+                  </h4>
                   <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 space-y-1">
                     <div className="text-xs font-bold text-zinc-100">
                       Resultado: BPC (Copia) Tech II
                     </div>
                     <p className="text-[11px] text-zinc-400">
-                      Se lleva a Fabricación T2 junto con Morphite, componentes avanzados, PI y
-                      R.A.M.
+                      Pasa a Fabricación T2 junto con Morphite, componentes avanzados, PI y R.A.M.
                     </p>
                   </div>
                 </div>
@@ -197,7 +377,6 @@ export function IndustryOverviewSection({
               <ArrowDown className="w-4 h-4 text-amber-400" />
             </div>
 
-            {/* Etapa 4: Producto Final */}
             <div className="rounded-lg border border-zinc-700 bg-zinc-900/80 p-3.5 text-center space-y-1">
               <div className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold">
                 4. Producto Final
@@ -211,7 +390,6 @@ export function IndustryOverviewSection({
               <ArrowDown className="w-4 h-4 text-amber-400" />
             </div>
 
-            {/* Etapa 5: Venta en Hub */}
             <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3.5 text-center space-y-1">
               <div className="text-[11px] font-mono uppercase tracking-wider text-emerald-300 font-bold">
                 5. Venta / Distribución en Hub Comercial
@@ -224,7 +402,7 @@ export function IndustryOverviewSection({
         </figure>
       </div>
 
-      {/* BLOQUE 2: DIFERENCIAS DE CLON EN INDUSTRIA (ALPHA VS OMEGA) */}
+      {/* DIFERENCIAS DE CLON EN INDUSTRIA (ALPHA VS OMEGA) */}
       <div
         className={`border border-zinc-800 bg-zinc-900/60 p-4 sm:p-6 space-y-4 ${
           visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
@@ -280,10 +458,10 @@ export function IndustryOverviewSection({
               </div>
               <div className="pt-3 border-t border-zinc-800/80">
                 <a
-                  href={getIndustryModuleHref('skills')}
+                  href={getIndustryModuleHref('t1')}
                   className="inline-flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300"
                 >
-                  <span>Ver productos T1 de alta rotación para empezar</span>
+                  <span>Ir a Fabricación T1 y productos de alta rotación</span>
                   <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </a>
               </div>
@@ -329,7 +507,7 @@ export function IndustryOverviewSection({
                   href={getIndustryModuleHref('workflow')}
                   className="inline-flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300"
                 >
-                  <span>Ir al proceso de Invención Tech II paso a paso</span>
+                  <span>Ir a Invención & Producción T2</span>
                   <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </a>
               </div>
@@ -337,53 +515,24 @@ export function IndustryOverviewSection({
           )}
         </div>
 
-        <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="text-xs sm:text-sm text-zinc-200 space-y-1">
-            <p className="font-bold text-amber-300">
-              Regla Fundamental antes de fabricar cualquier plano
-            </p>
-            <p className="text-zinc-300 leading-relaxed">
-              Los minerales que minas tú mismo <strong>no son gratis</strong>: tienen un coste de
-              oportunidad igual al precio al que podrías venderlos hoy mismo en Jita o en el
-              programa de recompra (<em>Buyback</em>) de tu corporación. Si el producto terminado se
-              vende por debajo del valor de sus materias primas + tasas de instalación + impuestos de
-              mercado, estás destruyendo ISK al fabricarlo.
-            </p>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="text-xs sm:text-sm text-zinc-300">
+            <strong className="text-amber-300">El mineral no es gratis porque lo hayas minado tú:</strong>{' '}
+            todo material tiene precio de mercado o valor interno.
           </div>
+          <a
+            href={getIndustryModuleHref('logistics')}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300 shrink-0"
+          >
+            <span>Ver Reprocesado & Logística</span>
+            <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
+          </a>
         </div>
       </div>
 
-      {/* Accesos rápidos a los capítulos técnicos */}
+      {/* Accesos rápidos a los capítulos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {(
-          [
-            {
-              id: 'blueprints',
-              step: 'Capítulo 1',
-              title: 'Planos, ME/TE & SCI',
-              desc: 'BPO vs BPC, Regla de Oro T2 y simulador de materiales.',
-            },
-            {
-              id: 'workflow',
-              step: 'Capítulo 2',
-              title: 'Proceso & Invención T2',
-              desc: 'De comprar el BPO NPC a inventar con Datacores y Decryptors.',
-            },
-            {
-              id: 'economy',
-              step: 'Capítulo 3',
-              title: 'Economía & Break-Even',
-              desc: 'Sales Tax, Broker Fee y calculadora de punto de equilibrio.',
-            },
-            {
-              id: 'skills',
-              step: 'Capítulo 4',
-              title: 'Productos & Skills',
-              desc: 'Artículos de alta rotación, cadenas T2 y biblia de habilidades.',
-            },
-          ] as const
-        ).map((card) => (
+        {CHAPTER_SHORTCUTS.map((card) => (
           <a
             key={card.id}
             href={getIndustryModuleHref(card.id)}

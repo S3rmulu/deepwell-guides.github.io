@@ -28,14 +28,23 @@ export const PORTAL_GUIDES: GuideCardItem[] = [
   {
     id: 'industry-reactions',
     title: 'Industria, Planos (BPO/BPC), Invención T2 & Economía',
+    author: 'Bill Tangana',
     category: 'Manufactura & Mercado',
     status: 'active',
     cloneAccess: 'alpha-omega',
     summary:
-      'Cadena industrial completa desde materias primas y planos T1 (ME 10 / TE 20) hasta Invención Tech II con Datacores y Decryptors, System Cost Index (SCI), cálculo de Break-Even en hubs y productos de alta rotación.',
-    readTime: '16 min',
+      'Cadena industrial completa: conceptos base, blueprints (ME/TE/copias), fabricación T1, reprocesado y logística, impuestos/Break-Even, invención Tech II, reacciones Moon Goo, industria de alianza y herramientas.',
+    readTime: '22 min',
     updatedAt: 'Noviembre 2026',
-    tags: ['BPO & BPC', 'Invention T2', 'ME / TE', 'Break-Even ISK', 'Upwell'],
+    tags: [
+      'BPO & BPC',
+      'Fabricación T1',
+      'Logística',
+      'Invention T2',
+      'Reacciones',
+      'Alianza',
+      'Break-Even ISK',
+    ],
   },
   {
     id: 'nullsec-survival',

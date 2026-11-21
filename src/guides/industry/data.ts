@@ -4,6 +4,215 @@ import {
   SkillItem,
 } from '../../types';
 
+export interface ExternalResourceLink {
+  label: string;
+  url: string;
+  note?: string;
+}
+
+export interface IndustryBaseConceptItem {
+  term: string;
+  detail: string;
+}
+
+export const INDUSTRY_LIBRARY_INTRO =
+  'Este foro agrupa guías para fabricación, blueprints, investigación, invention T2, reacciones, PI, reprocesado, logística, costes y herramientas industriales.';
+
+export const INDUSTRY_LIBRARY_LINKS: {
+  oficialBase: ExternalResourceLink[];
+  guiasPrincipales: ExternalResourceLink[];
+  herramientas: ExternalResourceLink[];
+} = {
+  oficialBase: [
+    {
+      label: 'EVE Academy Industrialist',
+      url: 'https://www.eveonline.com/eve-academy/careers/industrialist',
+    },
+    {
+      label: 'Soporte EVE, pedidos de compra y venta',
+      url: 'https://support.eveonline.com/hc/es/articles/203218932-Pedidos-de-compra-y-venta',
+    },
+  ],
+  guiasPrincipales: [
+    { label: 'EVE University Industry', url: 'https://wiki.eveuniversity.org/Industry' },
+    { label: 'Manufacturing', url: 'https://wiki.eveuniversity.org/Manufacturing' },
+    { label: 'Blueprints', url: 'https://wiki.eveuniversity.org/Blueprints' },
+    { label: 'Research', url: 'https://wiki.eveuniversity.org/Research' },
+    { label: 'Invention', url: 'https://wiki.eveuniversity.org/Invention' },
+    { label: 'Reactions', url: 'https://wiki.eveuniversity.org/Reactions' },
+    { label: 'Planetary Industry', url: 'https://wiki.eveuniversity.org/Planetary_Industry' },
+    { label: 'Reprocessing', url: 'https://wiki.eveuniversity.org/Reprocessing' },
+  ],
+  herramientas: [
+    { label: 'Ravworks', url: 'https://ravworks.com/' },
+    { label: 'EVE Cookbook', url: 'https://evecookbook.com/' },
+    { label: 'Fuzzwork Blueprint Calculator', url: 'https://www.fuzzwork.co.uk/blueprint/' },
+    { label: 'Adam4EVE', url: 'https://www.adam4eve.eu/' },
+    { label: 'EVE Ref', url: 'https://everef.net/' },
+    { label: 'Janice', url: 'https://janice.e-351.com/' },
+    { label: 'EVE Tycoon', url: 'https://evetycoon.com/' },
+  ],
+};
+
+export const INDUSTRY_BASE_CONCEPTS: IndustryBaseConceptItem[] = [
+  {
+    term: 'Job',
+    detail: 'Trabajo de fabricación, copia, research, invention o reacción.',
+  },
+  {
+    term: 'Facility tax',
+    detail: 'Impuesto de la estructura donde produces.',
+  },
+  {
+    term: 'System cost index',
+    detail: 'Coste del sistema; sube si mucha gente produce allí.',
+  },
+  {
+    term: 'Material Efficiency / ME',
+    detail: 'Reduce materiales necesarios.',
+  },
+  {
+    term: 'Time Efficiency / TE',
+    detail: 'Reduce tiempo de fabricación.',
+  },
+  {
+    term: 'Slot / capacidad',
+    detail: 'Límite práctico de trabajos activos por personaje/cuenta.',
+  },
+];
+
+export const BLUEPRINT_CHECK_ITEMS: string[] = [
+  'ME: materiales, suele ser lo primero que duele en el margen.',
+  'TE: tiempo; importa más cuando produces volumen o usas estructuras caras.',
+  'Runs: usos disponibles en una copia.',
+  'Skills requeridas y materiales especiales.',
+  'Si el blueprint merece investigación o sale mejor comprar copias.',
+];
+
+export const RESEARCH_PRIORITIES: { label: string; detail: string }[] = [
+  { label: 'ME', detail: 'Primero si el ítem consume materiales caros.' },
+  { label: 'TE', detail: 'Si produces mucho volumen o los jobs son largos.' },
+  { label: 'Copying', detail: 'Para invention, contratos internos o producción distribuida.' },
+  {
+    label: 'Capital líquido',
+    detail: 'No inmovilizar todo el capital en BPOs si aún no sabes vender el producto.',
+  },
+];
+
+export const BLUEPRINT_READING_LINKS: ExternalResourceLink[] = [
+  { label: 'Blueprints (EVE University)', url: 'https://wiki.eveuniversity.org/Blueprints' },
+  { label: 'Research (EVE University)', url: 'https://wiki.eveuniversity.org/Research' },
+];
+
+export const T1_STARTER_IDEAS: string[] = [
+  'Munición y drones con volumen de mercado.',
+  'Módulos baratos de rotación alta.',
+  'Rigs o componentes si el margen acompaña.',
+  'Cosas que la alianza consuma internamente.',
+];
+
+export const T1_PRE_PRODUCTION_CHECKLIST: string[] = [
+  'Mira volumen diario, no solo precio.',
+  'Calcula con buy price y sell price realistas.',
+  'Incluye taxes, broker fees, hauling y estructura.',
+  'Prueba lotes pequeños antes de llenar hangares.',
+];
+
+export const T1_TOOL_LINKS: ExternalResourceLink[] = [
+  { label: 'Ravworks', url: 'https://ravworks.com/' },
+  { label: 'Fuzzwork Blueprint Calculator', url: 'https://www.fuzzwork.co.uk/blueprint/' },
+  { label: 'EVE Tycoon', url: 'https://evetycoon.com/' },
+];
+
+export const INVENTION_SYSTEM_PIECES: string[] = [
+  'BPC T1 base.',
+  'Datacores adecuados.',
+  'Skills de ciencia correspondientes.',
+  'Decryptors si quieres modificar runs, ME, TE o probabilidad.',
+  'Componentes T2 y materiales de moon goo/reactions.',
+];
+
+export const INVENTION_READING_LINKS: ExternalResourceLink[] = [
+  { label: 'Invention (EVE University)', url: 'https://wiki.eveuniversity.org/Invention' },
+  { label: 'Tech 2 Production (EVE University)', url: 'https://wiki.eveuniversity.org/Tech_2_Production' },
+];
+
+export const REACTION_TYPES: { name: string; detail: string }[] = [
+  { name: 'Composite reactions', detail: 'Para cadenas T2.' },
+  { name: 'Biochemical reactions', detail: 'Para drogas/boosters.' },
+  { name: 'Hybrid reactions', detail: 'Para producción T3.' },
+];
+
+export const REACTION_WARNINGS: string[] = [
+  'Estructuras y rigs necesarios.',
+  'Materiales que ocupan mucho y se mueven lentamente.',
+  'Cambios de precio entre input y output.',
+  'Jobs largos que bloquean capital.',
+];
+
+export const REACTION_READING_LINKS: ExternalResourceLink[] = [
+  { label: 'Reactions (EVE University)', url: 'https://wiki.eveuniversity.org/Reactions' },
+  { label: 'Moon mining (EVE University)', url: 'https://wiki.eveuniversity.org/Moon_mining' },
+];
+
+export const LOGISTICS_KEY_POINTS: string[] = [
+  'Las skills y la estructura cambian el rendimiento del reprocesado.',
+  'Comprimir ayuda muchísimo al transporte.',
+  'Comprar materiales puede ser mejor que minarlo todo.',
+  'El hauling y el collateral también son costes.',
+  'Separar stock personal, stock corp y material vendido evita líos.',
+];
+
+export const LOGISTICS_READING_LINKS: ExternalResourceLink[] = [
+  { label: 'Reprocessing (EVE University)', url: 'https://wiki.eveuniversity.org/Reprocessing' },
+  { label: 'Hauling (EVE University)', url: 'https://wiki.eveuniversity.org/Hauling' },
+  { label: 'Fuzzwork ore', url: 'https://www.fuzzwork.co.uk/ore/' },
+];
+
+export const ALLIANCE_PILLARS: { title: string; detail: string }[] = [
+  { title: 'Buyback', detail: 'De ore, gas, salvage, y loot.' },
+  { title: 'Contratos internos', detail: 'Para el suministro de materiales.' },
+  {
+    title: 'Productos prioritarios',
+    detail: 'Munición, drones, rigs y módulos de doctrina.',
+  },
+  {
+    title: 'Precios pactados',
+    detail: 'Para evitar discusiones interminables. x% Jita Buy según web janice.',
+  },
+];
+
+export const INDUSTRY_TOOL_CATEGORIES: {
+  category: string;
+  links: ExternalResourceLink[];
+}[] = [
+  {
+    category: 'Planificación y cálculo',
+    links: [
+      { label: 'Ravworks', url: 'https://ravworks.com/' },
+      { label: 'EVE Cookbook', url: 'https://evecookbook.com/' },
+      { label: 'Fuzzwork Blueprint Calculator', url: 'https://www.fuzzwork.co.uk/blueprint/' },
+      { label: 'Adam4EVE', url: 'https://www.adam4eve.eu/' },
+    ],
+  },
+  {
+    category: 'Precio, mercado y valoración',
+    links: [
+      { label: 'Janice', url: 'https://janice.e-351.com/' },
+      { label: 'EVE Tycoon', url: 'https://evetycoon.com/' },
+      { label: 'EVE Market Browser', url: 'https://evemarketbrowser.com/' },
+      { label: 'Fuzzwork Market', url: 'https://market.fuzzwork.co.uk/' },
+    ],
+  },
+  {
+    category: 'Referencia de ítems/materiales',
+    links: [
+      { label: 'EVE Ref', url: 'https://everef.net/' },
+      { label: 'EVE University Industry', url: 'https://wiki.eveuniversity.org/Industry' },
+    ],
+  },
+];
+
 export interface BlueprintConceptRow {
   type: 'BPO (Blueprint Original)' | 'BPC (Blueprint Copy)';
   code: 'BPO' | 'BPC';

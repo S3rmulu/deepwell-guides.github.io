@@ -1,6 +1,7 @@
 import { useId, useState } from 'react';
 import { Calculator, Coins, RotateCcw, TrendingUp } from 'lucide-react';
 import { VisualMode } from '../../../types';
+import { MODULE_SEARCH_KEYWORDS, normalizeSearch } from '../searchIndex';
 
 interface EconomySectionProps {
   searchQuery: string;
@@ -13,7 +14,7 @@ export function EconomySection({
   visualMode,
   onResetSearch,
 }: EconomySectionProps) {
-  const q = searchQuery.trim().toLowerCase();
+  const q = normalizeSearch(searchQuery);
 
   const salePriceId = useId();
   const salesTaxId = useId();
@@ -21,8 +22,6 @@ export function EconomySection({
   const buyBrokerId = useId();
   const sciCostId = useId();
 
-  // Pre-cargado con el ejemplo práctico exacto del borrador:
-  // P_venta = 210 ISK, Sales Tax = 5.02%, Broker Fee Venta = 2.03% (combinados = 7.05%), Broker Fee Compra = 2.03%
   const [salePrice, setSalePrice] = useState<string>('210');
   const [salesTaxPct, setSalesTaxPct] = useState<string>('5.02');
   const [sellBrokerPct, setSellBrokerPct] = useState<string>('2.03');
@@ -55,17 +54,13 @@ export function EconomySection({
     setInstallCostPerUnit('0');
   };
 
-  const matchesEconomy =
-    !q ||
-    'economia margen neto impuestos punto de equilibrio break-even costes mercado sales tax impuesto venta 5,02% 5.02% accounting 11% broker fee comision corredor 2,03% 3% broker relations standing ingreso neto 210 isk 195,195 191,31 buy order orden compra'.includes(
-      q
-    );
+  const matchesEconomy = !q || MODULE_SEARCH_KEYWORDS.economy.includes(q);
 
   if (!matchesEconomy) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 sm:p-8 text-center space-y-3">
         <p className="text-sm font-semibold text-zinc-200">
-          No hay coincidencias en Economía, Margen Neto e Impuestos para "{searchQuery}".
+          No hay coincidencias en Economía, Margen Neto e Impuestos para &quot;{searchQuery}&quot;.
         </p>
         <button
           type="button"
@@ -90,12 +85,12 @@ export function EconomySection({
         <div className="space-y-1.5">
           <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
             <Coins className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
-            <span>Módulo 3: Economía, Margen Neto e Impuestos</span>
+            <span>Economía, Margen Neto e Impuestos</span>
           </h2>
           <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-            Para garantizar la rentabilidad de cada lote antes de comprar materias primas o pulsar
-            Start, calcula siempre tu <strong>Punto de Equilibrio (Break-Even)</strong> descontando
-            las comisiones del mercado regional.
+            Calcula tu <strong>Punto de Equilibrio (Break-Even)</strong> incluyendo volumen diario,
+            buy price y sell price realistas, taxes, broker fees, hauling y coste de estructura
+            (SCI + facility tax) antes de lanzar el job.
           </p>
         </div>
 
@@ -110,10 +105,9 @@ export function EconomySection({
               </span>
             </div>
             <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              Se cobra automáticamente al ejecutarse cualquier venta (tanto si vendes con orden a
-              plazo como si vendes al instante contra una Buy Order). Es reducible mediante la
-              habilidad <strong>Accounting</strong> (<strong>11% de descuento relativo</strong> por
-              nivel).
+              Se cobra al ejecutarse cualquier venta (orden a plazo o venta directa contra Buy
+              Order). Se reduce con la habilidad <strong>Accounting</strong> (
+              <strong>11% de descuento relativo</strong> por nivel).
             </p>
           </article>
 
@@ -127,10 +121,9 @@ export function EconomySection({
               </span>
             </div>
             <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              Se cobra por adelantado al publicar una orden de venta (<em>Sell Order</em>) o una
-              orden de compra (<em>Buy Order</em>) en el mercado. Se reduce en estaciones NPC con la
-              habilidad <strong>Broker Relations</strong> y tu reputación (<em>standing</em>) con la
-              facción y corporación dueña de la estación.
+              Se paga al publicar una orden de venta (<em>Sell Order</em>) o compra (
+              <em>Buy Order</em>). Baja en estaciones NPC con <strong>Broker Relations</strong> y
+              tu <em>standing</em> con la facción y corporación dueña de la estación.
             </p>
           </article>
         </div>
@@ -141,7 +134,7 @@ export function EconomySection({
               Fórmula de Ingreso Neto por Unidad
             </div>
             <p className="text-xs text-zinc-400">
-              Lo que realmente entra en tu cartera tras vender una unidad a precio P_venta:
+              Lo que entra en cartera tras vender una unidad a precio P_venta:
             </p>
           </div>
           <code className="px-3 py-2 rounded-lg bg-zinc-900 border border-amber-500/30 text-amber-300 font-mono text-xs sm:text-sm">
@@ -150,7 +143,7 @@ export function EconomySection({
         </div>
       </div>
 
-      {/* 2. EJEMPLO PRÁCTICO DEL BORRADOR (210 ISK) */}
+      {/* 2. EJEMPLO PRÁCTICO (210 ISK) */}
       <div
         className={`border border-amber-500/40 bg-zinc-950 p-4 sm:p-6 space-y-4 ${
           visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
@@ -163,8 +156,8 @@ export function EconomySection({
               <span>Ejemplo Práctico de Rentabilidad (Caso 210 ISK)</span>
             </h3>
             <p className="text-xs sm:text-sm text-zinc-400">
-              Cálculo del techo máximo que puedes pagar por las materias primas por unidad para no
-              perder ISK.
+              Cálculo del techo máximo que puedes pagar por los materiales por unidad sin perder
+              ISK.
             </p>
           </div>
           <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300">
@@ -195,8 +188,8 @@ export function EconomySection({
               &lt; 195,19 ISK
             </div>
             <p className="text-xs text-zinc-200 leading-relaxed">
-              Si compras los materiales al instante en el mercado, el coste total de materias primas
-              (más SCI) por unidad debe ser <strong>inferior a 195,19 ISK</strong>.
+              Si compras al instante en Sell Orders, el coste total de materiales (más SCI y
+              hauling) por unidad debe quedar por debajo de <strong>195,19 ISK</strong>.
             </p>
           </div>
 
@@ -208,7 +201,7 @@ export function EconomySection({
               ≤ 191,31 ISK
             </div>
             <p className="text-xs text-zinc-200 leading-relaxed">
-              Si adquieres materiales poniendo una <em>Buy Order</em> con comisión de corredor del{' '}
+              Si compras con <em>Buy Order</em> y broker fee del{' '}
               <code className="text-sky-300">2,03%</code>:{' '}
               <code className="text-zinc-100">195,195 / (1 + 0,0203) ≈ 191,31 ISK</code>.
             </p>
@@ -229,8 +222,8 @@ export function EconomySection({
               <span>Calculadora Interactiva de Punto de Equilibrio (Break-Even)</span>
             </h3>
             <p className="text-xs sm:text-sm text-zinc-400">
-              Introduce el precio de venta de cualquier artículo en Jita/Dodixie y tus tasas reales
-              para saber cuánto puedes pagar como máximo por sus insumos.
+              Introduce el precio de venta en Jita/Dodixie y tus tasas reales para fijar el techo de
+              insumos.
             </p>
           </div>
           <button
