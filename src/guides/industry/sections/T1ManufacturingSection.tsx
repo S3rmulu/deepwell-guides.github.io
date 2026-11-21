@@ -66,9 +66,9 @@ export function T1ManufacturingSection({
             <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
               Ideas razonables para empezar
             </h3>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-300">
+            <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-300 list-disc list-inside">
               {T1_STARTER_IDEAS.map((idea) => (
-                <li key={idea}>• {idea}</li>
+                <li key={idea}>{idea}</li>
               ))}
             </ul>
           </div>
@@ -77,9 +77,9 @@ export function T1ManufacturingSection({
             <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
               Antes de producir
             </h3>
-            <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-300">
+            <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-300 list-disc list-inside">
               {T1_PRE_PRODUCTION_CHECKLIST.map((check) => (
-                <li key={check}>• {check}</li>
+                <li key={check}>{check}</li>
               ))}
             </ul>
           </div>
@@ -104,12 +104,17 @@ export function T1ManufacturingSection({
         </div>
       </div>
 
-      {/* PASO 1 Y PASO 3 OPERATIVOS EN EL CLIENTE DE EVE */}
+      {/* PASOS OPERATIVOS EN EL CLIENTE DE EVE */}
       <div
         className={`border border-zinc-800 bg-zinc-900/60 p-4 sm:p-6 space-y-4 ${
           visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
         }`}
       >
+        <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
+          <Cpu className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
+          <span>Ejecución en el Cliente de EVE (BPO → Manufacturing)</span>
+        </h2>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -141,9 +146,8 @@ export function T1ManufacturingSection({
 
           <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-base font-bold text-amber-400 flex items-center gap-1.5">
-                <Cpu className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span>2. Lanzar el job y recoger el lote</span>
+              <h3 className="text-base font-bold text-amber-400">
+                2. Lanzar el job y recoger el lote
               </h3>
               <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-200">
                 Manufacturing
@@ -177,76 +181,156 @@ export function T1ManufacturingSection({
           visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
         }`}
       >
-        <div className="space-y-1.5">
-          <h3 className="text-base sm:text-lg font-bold text-zinc-100 flex items-center gap-2">
-            <Lightbulb className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
-            <span>Ejemplos de Productos de Alta Rotación (Starter T1)</span>
-          </h3>
-          <p className="text-xs sm:text-sm text-zinc-400">
-            Cuatro líneas T1 con demanda diaria constante, BPOs baratos y escalado directo a T2.
-          </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="space-y-1">
+            <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
+              <span>Ejemplos de Productos de Alta Rotación (Starter T1)</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400">
+              Cuatro líneas T1 con demanda diaria constante, BPOs baratos y escalado directo a
+              Invención Tech II.
+            </p>
+          </div>
+          {cloneFilter === 'omega' && (
+            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-amber-500/15 border border-amber-500/35 text-amber-300">
+              MODO OMEGA · INSUMOS BASE PARA INVENCIÓN T2
+            </span>
+          )}
         </div>
 
         {products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {products.map((prod, idx) => (
-              <SpotlightCard
-                key={prod.id}
-                tone="amber"
-                className={`border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-3 ${
-                  visualMode === 'dossier' ? 'rounded-lg' : 'rounded-xl'
-                }`}
-              >
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h4 className="text-base font-bold text-amber-400">
-                      {idx + 1}. {prod.category}
-                    </h4>
-                    <span
-                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${getCloneBadgeClasses(
-                        prod.clone
-                      )}`}
-                    >
-                      ALPHA & OMEGA
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {prod.items.map((item) => (
-                      <div
-                        key={item.typeId}
-                        className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/80 text-xs font-semibold text-zinc-100"
+          visualMode === 'dossier' ? (
+            <div
+              tabIndex={0}
+              role="region"
+              aria-labelledby="starter-t1-table-caption"
+              className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950"
+            >
+              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                <caption id="starter-t1-table-caption" className="sr-only">
+                  Productos Tech I de alta rotación recomendados para empezar en industria
+                </caption>
+                <thead>
+                  <tr className="border-b border-zinc-800 bg-zinc-900/70 text-[11px] font-mono uppercase tracking-wider text-zinc-300">
+                    <th scope="col" className="p-3">
+                      Línea de Producto
+                    </th>
+                    <th scope="col" className="p-3">
+                      Artículos Clave
+                    </th>
+                    <th scope="col" className="p-3">
+                      Demanda & Rotación
+                    </th>
+                    <th scope="col" className="p-3">
+                      Escalado T2 (Omega)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/80">
+                  {products.map((prod, idx) => (
+                    <tr key={prod.id} className="align-top hover:bg-zinc-900/40">
+                      <th
+                        scope="row"
+                        className="p-3 font-bold text-amber-400 whitespace-nowrap"
                       >
-                        <img
-                          src={`https://images.evetech.net/types/${item.typeId}/icon?size=64`}
-                          alt=""
-                          width={22}
-                          height={22}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-5 h-5 rounded object-contain shrink-0"
-                        />
-                        <span>{item.name}</span>
-                      </div>
-                    ))}
+                        {idx + 1}. {prod.category}
+                      </th>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-1.5 min-w-[14rem]">
+                          {prod.items.map((item) => (
+                            <span
+                              key={item.typeId}
+                              className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-xs font-semibold text-zinc-100"
+                            >
+                              <img
+                                src={`https://images.evetech.net/types/${item.typeId}/icon?size=64`}
+                                alt=""
+                                width={18}
+                                height={18}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-4 h-4 rounded object-contain shrink-0"
+                              />
+                              <span>{item.name}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="p-3 text-xs text-zinc-300 leading-relaxed min-w-[15rem]">
+                        {prod.rotationNote}
+                      </td>
+                      <td className="p-3 text-xs text-amber-200/90 leading-relaxed min-w-[15rem]">
+                        {prod.upgradePath}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {products.map((prod, idx) => (
+                <SpotlightCard
+                  key={prod.id}
+                  tone="amber"
+                  className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5 space-y-3"
+                >
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="text-base font-bold text-amber-400">
+                        {idx + 1}. {prod.category}
+                      </h3>
+                      <span
+                        className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${getCloneBadgeClasses(
+                          prod.clone
+                        )}`}
+                      >
+                        ALPHA & OMEGA
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {prod.items.map((item) => (
+                        <div
+                          key={item.typeId}
+                          className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/80 text-xs font-semibold text-zinc-100"
+                        >
+                          <img
+                            src={`https://images.evetech.net/types/${item.typeId}/icon?size=64`}
+                            alt=""
+                            width={22}
+                            height={22}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-5 h-5 rounded object-contain shrink-0"
+                          />
+                          <span>{item.name}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                      {prod.rotationNote}
+                    </p>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                    {prod.rotationNote}
-                  </p>
-                </div>
-
-                <div className="pt-2.5 border-t border-zinc-800/80 text-xs text-zinc-300">
-                  <strong className="text-amber-300">Escalado T2:</strong> {prod.upgradePath}
-                </div>
-              </SpotlightCard>
-            ))}
-          </div>
+                  <div
+                    className={`pt-2.5 border-t text-xs ${
+                      cloneFilter === 'omega'
+                        ? 'border-amber-500/40 text-amber-200 bg-amber-500/10 -mx-2 px-2.5 py-2 rounded-lg'
+                        : 'border-zinc-800/80 text-zinc-300'
+                    }`}
+                  >
+                    <strong className="text-amber-300">Escalado T2:</strong> {prod.upgradePath}
+                  </div>
+                </SpotlightCard>
+              ))}
+            </div>
+          )
         ) : (
           <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-xs text-zinc-400">
-            {cloneFilter === 'omega'
-              ? 'El filtro está fijado en "Solo Omega" (estas líneas son Alpha & Omega, también fabricables en Omega).'
-              : 'Ningún ejemplo de producto coincide con el buscador actual.'}
+            Ningún ejemplo de producto coincide con el buscador actual.
           </div>
         )}
       </div>

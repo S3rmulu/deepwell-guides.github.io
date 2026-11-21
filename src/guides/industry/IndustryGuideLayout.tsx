@@ -146,7 +146,7 @@ export function IndustryGuideLayout({
                   <a
                     key={m.id}
                     href={getIndustryModuleHref(m.id)}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 hover:border-amber-500/60 text-zinc-200 hover:text-amber-300 transition-colors"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-zinc-900 border border-zinc-700 hover:border-amber-500/60 text-zinc-200 hover:text-amber-300 transition-colors"
                   >
                     <span>{m.shortLabel}</span>
                     <span className="font-mono tabular-nums text-amber-400">

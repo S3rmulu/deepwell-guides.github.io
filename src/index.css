@@ -69,7 +69,7 @@
     button:not(.compact-control),
     select,
     textarea,
-    input:not([type='checkbox'], [type='radio']),
+    input:not([type='checkbox'], [type='radio'], [type='range']),
     [role='button'],
     nav a
   ) {

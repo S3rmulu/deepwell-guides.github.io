@@ -1,6 +1,7 @@
 import { BookOpen, RotateCcw } from 'lucide-react';
 import { CloneFilter, SkillItem, VisualMode } from '../../../types';
 import { getCloneBadgeClasses, matchesClone } from '../../../components/ui/cloneBadges';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { INDUSTRY_SKILLS_BIBLE } from '../data';
 import { MODULE_SEARCH_KEYWORDS, normalizeSearch } from '../searchIndex';
 
@@ -84,24 +85,68 @@ export function IndustrySkillsSection({
                   {categoryName}
                 </h3>
 
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950 divide-y divide-zinc-800/80">
-                  {groupSkills.map((skill) => (
-                    <article
-                      key={skill.name}
-                      className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-6"
-                    >
-                      <div className="space-y-1 max-w-2xl">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="text-sm font-bold text-zinc-100">{skill.name}</h4>
-                          <span
-                            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${getCloneBadgeClasses(
-                              skill.clone
-                            )}`}
-                          >
-                            {skill.clone === 'alpha-omega' ? 'ALPHA & OMEGA' : 'SOLO OMEGA'}
+                {visualMode === 'dossier' ? (
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-950 divide-y divide-zinc-800/80">
+                    {groupSkills.map((skill) => (
+                      <article
+                        key={skill.name}
+                        className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-6"
+                      >
+                        <div className="space-y-1 max-w-2xl">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="text-sm font-bold text-zinc-100">{skill.name}</h4>
+                            <span
+                              className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${getCloneBadgeClasses(
+                                skill.clone
+                              )}`}
+                            >
+                              {skill.clone === 'alpha-omega' ? 'ALPHA & OMEGA' : 'SOLO OMEGA'}
+                            </span>
+                            <span
+                              className={`text-[10px] font-mono px-2 py-0.5 rounded ${
+                                skill.priority === 'Crítica'
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                                  : 'bg-zinc-900 text-zinc-300 border border-zinc-700'
+                              }`}
+                            >
+                              Prioridad {skill.priority}
+                            </span>
+                          </div>
+                          <p className="text-sm text-zinc-300 leading-relaxed">{skill.effect}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-1 gap-1.5 shrink-0 text-xs font-mono border-t lg:border-t-0 pt-2.5 lg:pt-0 border-zinc-800 lg:text-right min-w-[13rem]">
+                          <span className="text-zinc-300">
+                            Alpha: <strong className="text-zinc-100">{skill.alphaCap}</strong>
                           </span>
+                          <span className="text-amber-400">
+                            Omega: <strong>{skill.omegaCap}</strong>
+                          </span>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {groupSkills.map((skill) => (
+                      <SpotlightCard
+                        key={skill.name}
+                        tone={skill.clone === 'omega' ? 'amber' : 'emerald'}
+                        className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-3"
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h4 className="text-sm font-bold text-zinc-100">{skill.name}</h4>
+                            <span
+                              className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${getCloneBadgeClasses(
+                                skill.clone
+                              )}`}
+                            >
+                              {skill.clone === 'alpha-omega' ? 'ALPHA & OMEGA' : 'SOLO OMEGA'}
+                            </span>
+                          </div>
                           <span
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded ${
+                            className={`inline-block text-[10px] font-mono px-2 py-0.5 rounded ${
                               skill.priority === 'Crítica'
                                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                                 : 'bg-zinc-900 text-zinc-300 border border-zinc-700'
@@ -109,21 +154,23 @@ export function IndustrySkillsSection({
                           >
                             Prioridad {skill.priority}
                           </span>
+                          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed pt-1">
+                            {skill.effect}
+                          </p>
                         </div>
-                        <p className="text-sm text-zinc-300 leading-relaxed">{skill.effect}</p>
-                      </div>
 
-                      <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-1 gap-1.5 shrink-0 text-xs font-mono border-t lg:border-t-0 pt-2.5 lg:pt-0 border-zinc-800 lg:text-right min-w-[13rem]">
-                        <span className="text-zinc-300">
-                          Alpha: <strong className="text-zinc-100">{skill.alphaCap}</strong>
-                        </span>
-                        <span className="text-amber-400">
-                          Omega: <strong>{skill.omegaCap}</strong>
-                        </span>
-                      </div>
-                    </article>
-                  ))}
-                </div>
+                        <div className="pt-2.5 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                          <span className="text-zinc-300">
+                            Alpha: <strong className="text-zinc-100">{skill.alphaCap}</strong>
+                          </span>
+                          <span className="text-amber-400">
+                            Omega: <strong>{skill.omegaCap}</strong>
+                          </span>
+                        </div>
+                      </SpotlightCard>
+                    ))}
+                  </div>
+                )}
               </section>
             );
           })}

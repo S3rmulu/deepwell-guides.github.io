@@ -2,6 +2,7 @@ import { KeyboardEvent, useRef, useState } from 'react';
 import { AlertTriangle, Atom, ExternalLink, Layers, Lock, RotateCcw } from 'lucide-react';
 import { CloneFilter, IndustryChainTabItem, VisualMode } from '../../../types';
 import { matchesClone } from '../../../components/ui/cloneBadges';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import {
   ADVANCED_CHAINS_PREVIEW,
   REACTION_READING_LINKS,
@@ -97,24 +98,25 @@ export function ReactionsSection({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {REACTION_TYPES.map((type) => (
-            <div
+            <SpotlightCard
               key={type.name}
+              tone="amber"
               className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-1"
             >
-              <div className="text-xs font-mono font-bold text-amber-300">{type.name}</div>
+              <h3 className="text-xs font-mono font-bold text-amber-300">{type.name}</h3>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">{type.detail}</p>
-            </div>
+            </SpotlightCard>
           ))}
         </div>
 
         <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-4 space-y-2">
-          <div className="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold flex items-center gap-1.5">
+          <h3 className="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold flex items-center gap-1.5">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" aria-hidden="true" />
             <span>Cuidado con</span>
-          </div>
-          <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-200">
+          </h3>
+          <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-200 list-disc list-inside">
             {REACTION_WARNINGS.map((warn) => (
-              <li key={warn}>• {warn}</li>
+              <li key={warn}>{warn}</li>
             ))}
           </ul>
         </div>
@@ -144,10 +146,10 @@ export function ReactionsSection({
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-zinc-100 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
               <Layers className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
               <span>Cadenas Específicas Avanzadas (HAM T2, Moon Goo & Capitales)</span>
-            </h3>
+            </h2>
             <p className="text-xs sm:text-sm text-zinc-400">
               Resumen técnico de las tres grandes cadenas industriales de especialización Omega.
             </p>
@@ -206,7 +208,7 @@ export function ReactionsSection({
           )}
 
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h4 className="text-base font-bold text-amber-400">{selectedChain.title}</h4>
+            <h3 className="text-base font-bold text-amber-400">{selectedChain.title}</h3>
             <span className="text-[11px] font-mono px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/35">
               {selectedChain.facility}
             </span>
@@ -216,20 +218,20 @@ export function ReactionsSection({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3.5 space-y-2">
-              <div className="text-xs font-mono uppercase text-amber-400 font-bold">
+              <h4 className="text-xs font-mono uppercase text-amber-400 font-bold">
                 Insumos y Requisitos Clave
-              </div>
-              <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-300">
+              </h4>
+              <ul className="space-y-1.5 text-xs sm:text-sm text-zinc-300 list-disc list-inside">
                 {selectedChain.inputs.map((inp) => (
-                  <li key={inp}>• {inp}</li>
+                  <li key={inp}>{inp}</li>
                 ))}
               </ul>
             </div>
 
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3.5 space-y-2">
-              <div className="text-xs font-mono uppercase text-sky-300 font-bold">
+              <h4 className="text-xs font-mono uppercase text-sky-300 font-bold">
                 Secuencia de Ejecución
-              </div>
+              </h4>
               <ol className="space-y-1.5 text-xs sm:text-sm text-zinc-300 list-decimal list-inside">
                 {selectedChain.steps.map((st, i) => (
                   <li key={i}>{st}</li>

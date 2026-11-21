@@ -8,10 +8,12 @@ import { matchesClone } from '../../components/ui/cloneBadges';
 import {
   ADVANCED_CHAINS_PREVIEW,
   ALLIANCE_PILLARS,
+  ALLIANCE_WORKFLOW_STEPS,
   BLUEPRINT_CHECK_ITEMS,
   BLUEPRINT_COMPARISON,
   DECRYPTORS_REFERENCE,
   EFFICIENCY_PARAMETERS,
+  HAULING_LOGISTICS_RULES,
   INDUSTRY_BASE_CONCEPTS,
   INDUSTRY_LIBRARY_INTRO,
   INDUSTRY_LIBRARY_LINKS,
@@ -21,10 +23,12 @@ import {
   LOGISTICS_KEY_POINTS,
   REACTION_TYPES,
   REACTION_WARNINGS,
+  REPROCESSING_YIELD_COMPARISON,
   RESEARCH_PRIORITIES,
   STARTER_PRODUCTS,
   T1_PRE_PRODUCTION_CHECKLIST,
   T1_STARTER_IDEAS,
+  TAX_SKILL_PRESETS,
   UPWELL_ENGINEERING_COMPLEXES,
 } from './data';
 
@@ -36,14 +40,22 @@ export function normalizeSearch(text: string): string {
     .trim();
 }
 
+/**
+ * Starter T1 products are manufactured by both Alpha and Omega pilots
+ * (and Omega pilots use T1 items/BPCs as direct inputs for T2 invention).
+ */
+export function matchesStarterProductClone(
+  _productClone: IndustryStarterProductItem['clone'],
+  _cloneFilter: CloneFilter
+): boolean {
+  return true;
+}
+
 export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
   overview: normalizeSearch(
     [
       'bill tangana biblioteca industria produccion indice enlaces rapidos',
       INDUSTRY_LIBRARY_INTRO,
-      ...INDUSTRY_LIBRARY_LINKS.oficialBase.map((l) => `${l.label} ${l.url}`),
-      ...INDUSTRY_LIBRARY_LINKS.guiasPrincipales.map((l) => `${l.label} ${l.url}`),
-      ...INDUSTRY_LIBRARY_LINKS.herramientas.map((l) => `${l.label} ${l.url}`),
       ...INDUSTRY_BASE_CONCEPTS.map((c) => `${c.term} ${c.detail}`),
       'que estas pagando realmente fabricar no es convertir minerales en isk gratis coste oportunidad riesgo mercado',
       'si no has calculado coste total precio de venta y volumen vendido no estas fabricando estas apostando con pasos extra',
@@ -56,7 +68,7 @@ export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
       'no siempre significa beneficio inmediato capital inmovilizar',
       ...BLUEPRINT_CHECK_ITEMS,
       ...RESEARCH_PRIORITIES.map((r) => `${r.label} ${r.detail}`),
-      'system cost index sci jita perimeter raitaru azbel sotiyo regla de oro t2 simulador formula redondeo',
+      'system cost index sci jita perimeter raitaru azbel sotiyo regla de oro t2 simulador formula redondeo carreras lote',
     ].join(' ')
   ),
   t1: normalizeSearch(
@@ -73,7 +85,11 @@ export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
       'reprocesado reprocessing minerales mineral no es gratis porque lo hayas minado tu valor interno precio mercado perdidas',
       'compresion comprimir transporte hauling collateral costes separar stock personal corp vendido',
       ...LOGISTICS_KEY_POINTS,
-      'fuzzwork ore reprocessing hauling',
+      ...REPROCESSING_YIELD_COMPARISON.map(
+        (r) => `${r.facility} ${r.security} ${r.baseYield} ${r.maxSkillYield} ${r.verdict}`
+      ),
+      ...HAULING_LOGISTICS_RULES.map((h) => `${h.code} ${h.title} ${h.metric} ${h.detail}`),
+      'fuzzwork ore reprocessing hauling athanor tatara rx-804 jump freighter',
     ].join(' ')
   ),
   economy: normalizeSearch(
@@ -81,6 +97,7 @@ export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
       'economia margen neto impuestos punto de equilibrio break-even costes mercado',
       'sales tax impuesto venta 5,02% 5.02% accounting 11% broker fee comision corredor 2,03% 3% broker relations standing',
       'ingreso neto 210 isk 195,195 191,31 buy order orden compra volumen diario buy price sell price taxes hauling estructura',
+      ...TAX_SKILL_PRESETS.map((p) => `${p.label} ${p.shortNote}`),
     ].join(' ')
   ),
   workflow: normalizeSearch(
@@ -96,7 +113,7 @@ export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
       'composite reactions biochemical reactions drogas boosters hybrid reactions t3 produccion avanzada',
       ...REACTION_TYPES.map((r) => `${r.name} ${r.detail}`),
       ...REACTION_WARNINGS,
-      'moon mining capitales dreadnought carriers rorqual',
+      'moon mining capitales dreadnought carriers rorqual ham t2 rage javelin',
     ].join(' ')
   ),
   alliance: normalizeSearch(
@@ -104,7 +121,8 @@ export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
       'industria de alianza economia interna buyback ore gas salvage loot contratos internos suministro materiales',
       'productos prioritarios municion drones rigs modulos doctrina precios pactados',
       'x% jita buy segun web janice',
-      ...ALLIANCE_PILLARS.map((p) => `${p.title} ${p.detail}`),
+      ...ALLIANCE_PILLARS.map((p) => `${p.code} ${p.title} ${p.detail}`),
+      ...ALLIANCE_WORKFLOW_STEPS.map((s) => `${s.step} ${s.title} ${s.actor} ${s.detail}`),
     ].join(' ')
   ),
   tools: normalizeSearch(
@@ -112,12 +130,14 @@ export const MODULE_SEARCH_KEYWORDS: Record<IndustryModuleId, string> = {
       'herramientas industriales planificacion calculo precio mercado valoracion referencia items materiales',
       'calcula en dos herramientas cuando vayas a meter mucho isk discrepan precios estructura impuestos me te materiales raros',
       'biblioteca enlaces rapidos oficial base guias principales planetary industry pi manufacturing',
+      INDUSTRY_LIBRARY_INTRO,
       ...INDUSTRY_TOOL_CATEGORIES.flatMap((cat) => [
         cat.category,
         ...cat.links.map((l) => `${l.label} ${l.url}`),
       ]),
       ...INDUSTRY_LIBRARY_LINKS.oficialBase.map((l) => `${l.label} ${l.url}`),
       ...INDUSTRY_LIBRARY_LINKS.guiasPrincipales.map((l) => `${l.label} ${l.url}`),
+      ...INDUSTRY_LIBRARY_LINKS.herramientas.map((l) => `${l.label} ${l.url}`),
     ].join(' ')
   ),
   skills: normalizeSearch(
@@ -181,7 +201,7 @@ export function getIndustrySearchMatches(
   const bpKeywordMatch = MODULE_SEARCH_KEYWORDS.blueprints.includes(q) ? 1 : 0;
 
   const starterCount = STARTER_PRODUCTS.filter(
-    (p) => matchesClone(p.clone, cloneFilter) && matchesStarterProductQuery(p, q)
+    (p) => matchesStarterProductClone(p.clone, cloneFilter) && matchesStarterProductQuery(p, q)
   ).length;
   const t1Match = (MODULE_SEARCH_KEYWORDS.t1.includes(q) ? 1 : 0) + starterCount;
 

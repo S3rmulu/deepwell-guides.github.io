@@ -1,5 +1,6 @@
 import { AlertTriangle, BookOpen, ExternalLink, RotateCcw, Wrench } from 'lucide-react';
 import { VisualMode } from '../../../types';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import {
   INDUSTRY_LIBRARY_INTRO,
   INDUSTRY_LIBRARY_LINKS,
@@ -52,28 +53,33 @@ export function ToolsSection({
             <Wrench className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
             <span>Herramientas Industriales</span>
           </h2>
+          <p className="text-xs sm:text-sm text-zinc-400">
+            Calculadoras de blueprints, visores de mercado regional, tasadores de lotes y bases de
+            datos de materiales.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {INDUSTRY_TOOL_CATEGORIES.map((group) => (
-            <section
+            <SpotlightCard
               key={group.category}
+              tone="amber"
               className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-3"
             >
               <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
                 {group.category}
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {group.links.map((link) => (
                   <li key={link.url}>
                     <a
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-start gap-1.5 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
+                      className="group inline-flex items-center gap-2 py-1 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
                     >
                       <ExternalLink
-                        className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
+                        className="w-3.5 h-3.5 text-amber-400 shrink-0"
                         aria-hidden="true"
                       />
                       <span className="underline decoration-zinc-700 group-hover:decoration-amber-400">
@@ -83,7 +89,7 @@ export function ToolsSection({
                   </li>
                 ))}
               </ul>
-            </section>
+            </SpotlightCard>
           ))}
         </div>
 
@@ -106,29 +112,29 @@ export function ToolsSection({
         }`}
       >
         <div className="space-y-1">
-          <h3 className="text-base sm:text-lg font-bold text-zinc-100 flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-bold text-zinc-100 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
-            <span>Directorio de Lectura y Guías Oficiales</span>
-          </h3>
+            <span>Biblioteca de Industria / Producción (Directorio Oficial & Wikis)</span>
+          </h2>
           <p className="text-xs sm:text-sm text-zinc-400">{INDUSTRY_LIBRARY_INTRO}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-2.5">
-            <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
               Oficial / base
-            </h4>
-            <ul className="space-y-2">
+            </h3>
+            <ul className="space-y-1.5">
               {INDUSTRY_LIBRARY_LINKS.oficialBase.map((link) => (
                 <li key={link.url}>
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-start gap-1.5 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
+                    className="group inline-flex items-center gap-2 py-1 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
                   >
                     <ExternalLink
-                      className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
+                      className="w-3.5 h-3.5 text-amber-400 shrink-0"
                       aria-hidden="true"
                     />
                     <span className="underline decoration-zinc-700 group-hover:decoration-amber-400">
@@ -141,20 +147,20 @@ export function ToolsSection({
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-2.5">
-            <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
               Guías principales (EVE University)
-            </h4>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2">
+            </h3>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
               {INDUSTRY_LIBRARY_LINKS.guiasPrincipales.map((link) => (
                 <li key={link.url}>
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-start gap-1.5 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
+                    className="group inline-flex items-center gap-2 py-1 text-xs sm:text-sm text-zinc-200 hover:text-amber-300 transition-colors"
                   >
                     <ExternalLink
-                      className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
+                      className="w-3.5 h-3.5 text-amber-400 shrink-0"
                       aria-hidden="true"
                     />
                     <span className="underline decoration-zinc-700 group-hover:decoration-amber-400">

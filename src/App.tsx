@@ -8,6 +8,7 @@ import { INDUSTRY_SKILLS_BIBLE, STARTER_PRODUCTS } from './guides/industry/data'
 import {
   getIndustrySearchMatches,
   matchesIndustrySkillQuery,
+  matchesStarterProductClone,
   matchesStarterProductQuery,
   MODULE_SEARCH_KEYWORDS,
   normalizeSearch,
@@ -253,7 +254,9 @@ export function App() {
   const filteredIndustryProducts = useMemo(() => {
     const query = normalizeSearch(searchQuery);
     return STARTER_PRODUCTS.filter(
-      (prod) => matchesClone(prod.clone, cloneFilter) && matchesStarterProductQuery(prod, query)
+      (prod) =>
+        matchesStarterProductClone(prod.clone, cloneFilter) &&
+        matchesStarterProductQuery(prod, query)
     );
   }, [cloneFilter, searchQuery]);
 

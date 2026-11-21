@@ -163,22 +163,177 @@ export const LOGISTICS_KEY_POINTS: string[] = [
   'Separar stock personal, stock corp y material vendido evita líos.',
 ];
 
+export interface ReprocessingYieldRow {
+  facility: string;
+  security: string;
+  baseYield: string;
+  maxSkillYield: string;
+  verdict: string;
+}
+
+export const REPROCESSING_YIELD_COMPARISON: ReprocessingYieldRow[] = [
+  {
+    facility: 'Estación NPC Estándar',
+    security: 'High-Sec / Low-Sec',
+    baseYield: '50,0%',
+    maxSkillYield: '~55,0%',
+    verdict: 'Pierdes material: vende la mena comprimida antes que reprocesar aquí.',
+  },
+  {
+    facility: 'Refinería Athanor (Rig M T1)',
+    security: 'High-Sec / Low-Sec',
+    baseYield: '51,0% + Rig',
+    maxSkillYield: '~78,2% – 82,9%',
+    verdict: 'Umbral mínimo rentable para reprocesar mineral estándar y lunas R4–R16.',
+  },
+  {
+    facility: 'Refinería Tatara (Rig L T2)',
+    security: 'Null-Sec / Wormhole',
+    baseYield: '52,0% + Rig T2',
+    maxSkillYield: '~89,3% – 90,6%',
+    verdict: 'Rendimiento máximo industrial con Reprocessing V, Efficiency V y RX-804.',
+  },
+];
+
+export interface HaulingLogisticsRule {
+  code: string;
+  title: string;
+  metric: string;
+  detail: string;
+}
+
+export const HAULING_LOGISTICS_RULES: HaulingLogisticsRule[] = [
+  {
+    code: 'LOG-01',
+    title: 'Compresión antes de mover',
+    metric: '-99% volumen m³',
+    detail:
+      'Comprime siempre el mineral, hielo o gas en una estructura Upwell (o junto a Porpoise/Orca/Rorqual) antes de sacarlo hacia el hub o la fábrica.',
+  },
+  {
+    code: 'LOG-02',
+    title: 'Techo de Collateral y Ganks',
+    metric: '105% Jita Sell',
+    detail:
+      'En contratos Courier fija el collateral al 105% del valor del lote. Si mueves tú mismo en High-Sec, no lleves BPOs originales ni cargas caras en haulers T1 sin tanque.',
+  },
+  {
+    code: 'LOG-03',
+    title: 'Flete por m³ vs. Compra Local',
+    metric: 'ISK / m³ salto',
+    detail:
+      'El mineral voluminoso (Tritanium) encarece el flete en Jump Freighter. A menudo sale más rentable exportar solo productos comprimidos/T2 e importar componentes compactos.',
+  },
+  {
+    code: 'LOG-04',
+    title: 'Separación de Hangares y Stock',
+    metric: '3 contenedores',
+    detail:
+      'Separa con contenedores: 1) Insumos reservados para jobs, 2) Lotes terminados listos para mercado, y 3) Material de corporación o pendiente de buyback.',
+  },
+];
+
 export const LOGISTICS_READING_LINKS: ExternalResourceLink[] = [
   { label: 'Reprocessing (EVE University)', url: 'https://wiki.eveuniversity.org/Reprocessing' },
   { label: 'Hauling (EVE University)', url: 'https://wiki.eveuniversity.org/Hauling' },
   { label: 'Fuzzwork ore', url: 'https://www.fuzzwork.co.uk/ore/' },
 ];
 
-export const ALLIANCE_PILLARS: { title: string; detail: string }[] = [
-  { title: 'Buyback', detail: 'De ore, gas, salvage, y loot.' },
-  { title: 'Contratos internos', detail: 'Para el suministro de materiales.' },
+export const ALLIANCE_PILLARS: { code: string; title: string; detail: string }[] = [
   {
+    code: 'PILAR 01',
+    title: 'Buyback',
+    detail: 'De ore, gas, salvage, y loot.',
+  },
+  {
+    code: 'PILAR 02',
+    title: 'Contratos internos',
+    detail: 'Para el suministro de materiales.',
+  },
+  {
+    code: 'PILAR 03',
     title: 'Productos prioritarios',
     detail: 'Munición, drones, rigs y módulos de doctrina.',
   },
   {
+    code: 'PILAR 04',
     title: 'Precios pactados',
     detail: 'Para evitar discusiones interminables. x% Jita Buy según web janice.',
+  },
+];
+
+export interface AllianceWorkflowStep {
+  step: string;
+  title: string;
+  actor: string;
+  detail: string;
+}
+
+export const ALLIANCE_WORKFLOW_STEPS: AllianceWorkflowStep[] = [
+  {
+    step: '01',
+    title: 'Tasación transparente en Janice',
+    actor: 'Minero / Piloto PvE',
+    detail:
+      'Selecciona el lote de mineral comprimido, gas, salvage o loot en tu hangar, cópialo en Janice (Jita Buy) y aplica la tasa oficial de la alianza (x% Jita Buy según web janice.).',
+  },
+  {
+    step: '02',
+    title: 'Contrato Privado de Buyback o Suministro',
+    actor: 'Logística / Corp Industrial',
+    detail:
+      'Crea un contrato Item Exchange privado a la corporación pegando el enlace de Janice en la descripción. El productor obtiene materia prima in-situ sin pagar impuestos ni flete desde Jita.',
+  },
+  {
+    step: '03',
+    title: 'Abastecimiento de Doctrina en Staging',
+    actor: 'Fabricante de Alianza',
+    detail:
+      'Transforma esos insumos en munición, drones, rigs, módulos y cascos de doctrina para abastecer el mercado de Staging antes de las operaciones de flota.',
+  },
+];
+
+export interface TaxSkillPresetItem {
+  id: string;
+  label: string;
+  shortNote: string;
+  salesTaxPct: string;
+  sellBrokerPct: string;
+  buyBrokerPct: string;
+}
+
+export const TAX_SKILL_PRESETS: TaxSkillPresetItem[] = [
+  {
+    id: 'draft-210',
+    label: 'Ejemplo Guía (210 ISK)',
+    shortNote: 'Sales 5,02% + Broker 2,03%',
+    salesTaxPct: '5.02',
+    sellBrokerPct: '2.03',
+    buyBrokerPct: '2.03',
+  },
+  {
+    id: 'no-skills',
+    label: 'Base sin Skills',
+    shortNote: 'Sales 5,02% + Broker 3,00%',
+    salesTaxPct: '5.02',
+    sellBrokerPct: '3.00',
+    buyBrokerPct: '3.00',
+  },
+  {
+    id: 'alpha-max',
+    label: 'Alpha Máx (Acc III / Broker II)',
+    shortNote: 'Sales 3,36% + Broker 2,40%',
+    salesTaxPct: '3.36',
+    sellBrokerPct: '2.40',
+    buyBrokerPct: '2.40',
+  },
+  {
+    id: 'omega-v',
+    label: 'Omega V (Acc V / Broker V)',
+    shortNote: 'Sales 2,26% + Broker 1,50%',
+    salesTaxPct: '2.26',
+    sellBrokerPct: '1.50',
+    buyBrokerPct: '1.50',
   },
 ];
 
