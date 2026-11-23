@@ -140,6 +140,50 @@ export interface ShortcutItem {
   tip: string;
 }
 
+export type ShipMiniGuideId = 'crystals' | 'command' | 'stealth' | 'hauling';
+
+export interface MiningCrystalTypeInfo {
+  id: 'type-a' | 'type-b' | 'type-c';
+  name: string;
+  badge: string;
+  yieldProfile: string;
+  wasteProfile: string;
+  bestFor: string;
+  warning: string;
+}
+
+export interface MiningCrystalGroupItem {
+  group: string;
+  ores: string;
+  skill: string;
+  t1Req: string;
+  t2Req: string;
+  recommendedType: 'Tipo A' | 'Tipo B' | 'Tipo A / B';
+  note: string;
+}
+
+export interface MiniGuideSkillReq {
+  name: string;
+  minLevel: string;
+  optimalLevel: string;
+  clone: 'alpha-omega' | 'alpha-expert' | 'omega';
+  role: string;
+}
+
+export interface ShipMiniGuideMeta {
+  id: ShipMiniGuideId;
+  title: string;
+  shortLabel: string;
+  appliesTo: ShipClass[];
+  clone: 'alpha-omega' | 'alpha-expert' | 'omega';
+  cloneLabel: string;
+  summary: string;
+  keyPoints: { title: string; detail: string }[];
+  skills: MiniGuideSkillReq[];
+  warnings?: string[];
+  searchText: string;
+}
+
 export interface IndustryStarterProductItem {
   id: string;
   category: 'Drones T1' | 'Munición y Misiles T1' | 'Módulos Frecuentes' | 'Cascos Ligeros T1';

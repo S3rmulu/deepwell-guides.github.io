@@ -211,6 +211,10 @@ function scrollToTopAccessible(): void {
   window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
 }
 
+function getRouteKey(route: WikiRoute): string {
+  return route.view === 'hub' ? 'hub' : `${route.guideId}:${route.moduleId}`;
+}
+
 export function useHashRoute() {
   const [parsed, setParsed] = useState<ParsedHashResult>(() =>
     typeof window === 'undefined'
@@ -223,8 +227,13 @@ export function useHashRoute() {
 
   useEffect(() => {
     const handleHashChange = () => {
-      setParsed(parseHash(window.location.hash));
-      scrollToTopAccessible();
+      const next = parseHash(window.location.hash);
+      setParsed((prev) => {
+        if (getRouteKey(prev.route) !== getRouteKey(next.route)) {
+          scrollToTopAccessible();
+        }
+        return next;
+      });
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
@@ -241,13 +250,23 @@ export function useHashRoute() {
   }, []);
 
   const navigateToMiningModule = useCallback(
-    (moduleId: MiningModuleId, params?: Record<string, string | undefined>) => {
+    (
+      moduleId: MiningModuleId,
+      params?: Record<string, string | undefined>,
+      options?: { replace?: boolean }
+    ) => {
       const target = getMiningModuleHref(moduleId, params);
+      if (options?.replace) {
+        if (window.location.hash !== target) {
+          window.history.replaceState(null, '', target);
+        }
+        setParsed(parseHash(target));
+        return;
+      }
       if (window.location.hash !== target) {
         window.location.hash = target;
       } else {
         setParsed(parseHash(target));
-        scrollToTopAccessible();
       }
     },
     []

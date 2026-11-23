@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CloneFilter, VisualMode } from './types';
+import { CloneFilter, ShipMiniGuideId, VisualMode } from './types';
 import { useHashRoute } from './router/useHashRoute';
 import { PORTAL_GUIDES } from './data/portalGuides';
 import { FITTINGS_LIST, SHIPS_CATALOG, SKILLS_BIBLE } from './guides/mining/data';
@@ -41,6 +41,10 @@ export function App() {
   const [cloneFilter, setCloneFilter] = useState<CloneFilter>('all');
   const [searchQuery, setSearchQuery] = useState(() => params.get('q') ?? '');
   const [shipTierFilter, setShipTierFilter] = useState<string>('ALL');
+  const [activeMiniGuide, setActiveMiniGuide] = useState<ShipMiniGuideId | null>(() => {
+    const g = params.get('guide');
+    return g === 'crystals' || g === 'command' || g === 'stealth' || g === 'hauling' ? g : null;
+  });
   const [specialtyTab, setSpecialtyTab] = useState<SpecialtyTab>('ore');
   const [visualMode, setVisualMode] = useState<VisualMode>(readInitialVisualMode);
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
@@ -63,7 +67,21 @@ export function App() {
     if (tabParam === 'ore' || tabParam === 'gas' || tabParam === 'ice' || tabParam === 'mercoxit') {
       setSpecialtyTab(tabParam);
     }
-  }, [params]);
+    const guideParam = params.get('guide');
+    if (
+      route.view === 'guide' &&
+      route.guideId === 'mining' &&
+      route.moduleId === 'ships' &&
+      (guideParam === 'crystals' ||
+        guideParam === 'command' ||
+        guideParam === 'stealth' ||
+        guideParam === 'hauling')
+    ) {
+      setActiveMiniGuide(guideParam);
+    } else {
+      setActiveMiniGuide(null);
+    }
+  }, [params, route]);
 
   useEffect(() => {
     try {
@@ -174,6 +192,21 @@ export function App() {
     setSearchQuery('');
     setLiveAnnouncement('Búsqueda limpiada.');
   }, []);
+
+  const handleSelectMiniGuide = useCallback(
+    (guideId: ShipMiniGuideId | null, replace = false) => {
+      setActiveMiniGuide(guideId);
+      const nextParams: Record<string, string | undefined> = {};
+      if (guideId) nextParams.guide = guideId;
+      if (searchQuery.trim()) nextParams.q = searchQuery.trim();
+      navigateToMiningModule(
+        'ships',
+        Object.keys(nextParams).length > 0 ? nextParams : undefined,
+        { replace }
+      );
+    },
+    [navigateToMiningModule, searchQuery]
+  );
 
   const handleInspectShipFittings = useCallback(
     (shipName: string) => {
@@ -381,6 +414,8 @@ export function App() {
             fittings={filteredFittings}
             shipTierFilter={shipTierFilter}
             onTierFilterChange={setShipTierFilter}
+            activeMiniGuide={activeMiniGuide}
+            onSelectMiniGuide={handleSelectMiniGuide}
             specialtyTab={specialtyTab}
             onSpecialtyTabChange={setSpecialtyTab}
             copiedId={copiedId}

@@ -65,7 +65,7 @@ export const SKILLS_BIBLE: SkillItem[] = [
     alphaCap: 'Limitada',
     omegaCap: 'Nivel V',
     clone: 'omega',
-    effect: 'Nivel III desbloquea cristales Tipo I; Nivel IV desbloquea cristales Tipo II para Strip Miners.',
+    effect: 'Nivel III desbloquea cristales T1; Nivel IV desbloquea cristales T2 (Tipo A, B y C) para Modulated Strip Miner II.',
     priority: 'Alta',
   },
   {

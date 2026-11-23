@@ -1,13 +1,81 @@
-import { CloneFilter, MiningModuleId } from '../../types';
+import { CloneFilter, MiningModuleId, ShipMiniGuideId } from '../../types';
 import { matchesClone } from '../../components/ui/cloneBadges';
 import {
   ACTIVITY_COMPARISON_MATRIX,
   EXPERT_SYSTEMS_CATALOG,
   FITTINGS_LIST,
+  MINING_CRYSTAL_GROUPS,
+  MINING_CRYSTAL_TYPES,
   MINING_SHORTCUTS,
+  SHIP_MINI_GUIDES,
   SHIPS_CATALOG,
   SKILLS_BIBLE,
 } from './data';
+
+export function normalizeMiningSearch(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+export function getMiniGuideMatchCounts(rawQuery: string): Record<ShipMiniGuideId, number> {
+  const q = normalizeMiningSearch(rawQuery);
+  const counts: Record<ShipMiniGuideId, number> = {
+    crystals: 0,
+    command: 0,
+    stealth: 0,
+    hauling: 0,
+  };
+  if (!q) return counts;
+
+  for (const mg of SHIP_MINI_GUIDES) {
+    let hits = 0;
+    if (
+      normalizeMiningSearch(mg.title).includes(q) ||
+      normalizeMiningSearch(mg.shortLabel).includes(q) ||
+      normalizeMiningSearch(mg.summary).includes(q) ||
+      normalizeMiningSearch(mg.searchText).includes(q) ||
+      mg.appliesTo.some((cls) => normalizeMiningSearch(cls).includes(q)) ||
+      mg.keyPoints.some(
+        (kp) =>
+          normalizeMiningSearch(kp.title).includes(q) ||
+          normalizeMiningSearch(kp.detail).includes(q)
+      ) ||
+      (mg.warnings?.some((w) => normalizeMiningSearch(w).includes(q)) ?? false) ||
+      mg.skills.some(
+        (s) =>
+          normalizeMiningSearch(s.name).includes(q) || normalizeMiningSearch(s.role).includes(q)
+      )
+    ) {
+      hits += 1;
+    }
+
+    if (mg.id === 'crystals') {
+      hits += MINING_CRYSTAL_TYPES.filter(
+        (ct) =>
+          normalizeMiningSearch(ct.name).includes(q) ||
+          normalizeMiningSearch(ct.badge).includes(q) ||
+          normalizeMiningSearch(ct.bestFor).includes(q) ||
+          normalizeMiningSearch(ct.wasteProfile).includes(q)
+      ).length;
+
+      hits += MINING_CRYSTAL_GROUPS.filter(
+        (cg) =>
+          normalizeMiningSearch(cg.group).includes(q) ||
+          normalizeMiningSearch(cg.ores).includes(q) ||
+          normalizeMiningSearch(cg.skill).includes(q) ||
+          normalizeMiningSearch(cg.recommendedType).includes(q) ||
+          normalizeMiningSearch(cg.note).includes(q)
+      ).length;
+    }
+
+    counts[mg.id] = hits;
+  }
+
+  return counts;
+}
 
 export const MECHANICS_TOPICS = [
   {
@@ -93,7 +161,7 @@ export function getModuleSearchMatches(
   rawQuery: string,
   cloneFilter: CloneFilter
 ): Record<MiningModuleId, number> {
-  const q = rawQuery.trim().toLowerCase();
+  const q = normalizeMiningSearch(rawQuery);
   if (!q) {
     return {
       overview: 0,
@@ -108,72 +176,78 @@ export function getModuleSearchMatches(
 
   const overviewExperts = EXPERT_SYSTEMS_CATALOG.filter(
     (e) =>
-      e.name.toLowerCase().includes(q) ||
-      e.activity.toLowerCase().includes(q) ||
-      e.roiNote.toLowerCase().includes(q) ||
-      e.skillsGranted.some((s) => s.toLowerCase().includes(q)) ||
-      e.shipsUnlocked.some((s) => s.toLowerCase().includes(q))
+      normalizeMiningSearch(e.name).includes(q) ||
+      normalizeMiningSearch(e.activity).includes(q) ||
+      normalizeMiningSearch(e.roiNote).includes(q) ||
+      e.skillsGranted.some((s) => normalizeMiningSearch(s).includes(q)) ||
+      e.shipsUnlocked.some((s) => normalizeMiningSearch(s).includes(q))
   ).length;
 
   const overviewMatrix = ACTIVITY_COMPARISON_MATRIX.filter(
     (row) =>
-      row.activity.toLowerCase().includes(q) ||
-      row.alphaStatus.toLowerCase().includes(q) ||
-      row.expertStatus.toLowerCase().includes(q) ||
-      row.omegaStatus.toLowerCase().includes(q)
+      normalizeMiningSearch(row.activity).includes(q) ||
+      normalizeMiningSearch(row.alphaStatus).includes(q) ||
+      normalizeMiningSearch(row.expertStatus).includes(q) ||
+      normalizeMiningSearch(row.omegaStatus).includes(q)
   ).length;
 
   const overviewShortcuts = MINING_SHORTCUTS.filter(
     (sc) =>
-      sc.keys.toLowerCase().includes(q) ||
-      sc.action.toLowerCase().includes(q) ||
-      sc.tip.toLowerCase().includes(q) ||
-      sc.category.toLowerCase().includes(q)
+      normalizeMiningSearch(sc.keys).includes(q) ||
+      normalizeMiningSearch(sc.action).includes(q) ||
+      normalizeMiningSearch(sc.tip).includes(q) ||
+      normalizeMiningSearch(sc.category).includes(q)
   ).length;
 
   const overviewBaseMatch =
     'alpha omega expert system ice harvesting trampa plex sp multiboxing'.includes(q) ? 1 : 0;
 
   const mechanicsCount = MECHANICS_TOPICS.filter(
-    (m) => m.title.toLowerCase().includes(q) || m.searchText.includes(q)
+    (m) => normalizeMiningSearch(m.title).includes(q) || normalizeMiningSearch(m.searchText).includes(q)
   ).length;
 
-  const shipsCount = SHIPS_CATALOG.filter(
+  const shipsCatalogCount = SHIPS_CATALOG.filter(
     (ship) =>
       matchesClone(ship.clone, cloneFilter) &&
-      (ship.name.toLowerCase().includes(q) ||
-        ship.shipClass.toLowerCase().includes(q) ||
-        ship.tier.toLowerCase().includes(q) ||
-        ship.role.toLowerCase().includes(q) ||
-        ship.requirements.toLowerCase().includes(q) ||
-        ship.bonuses.some((b) => b.toLowerCase().includes(q)) ||
-        ship.nullsecNote.toLowerCase().includes(q))
+      (normalizeMiningSearch(ship.name).includes(q) ||
+        normalizeMiningSearch(ship.shipClass).includes(q) ||
+        normalizeMiningSearch(ship.tier).includes(q) ||
+        normalizeMiningSearch(ship.role).includes(q) ||
+        normalizeMiningSearch(ship.requirements).includes(q) ||
+        ship.bonuses.some((b) => normalizeMiningSearch(b).includes(q)) ||
+        normalizeMiningSearch(ship.nullsecNote).includes(q))
   ).length;
+
+  const miniGuideCounts = getMiniGuideMatchCounts(rawQuery);
+  const miniGuidesTotal = Object.values(miniGuideCounts).reduce((acc, n) => acc + n, 0);
+  const shipsCount = shipsCatalogCount + miniGuidesTotal;
 
   const skillsCount = SKILLS_BIBLE.filter(
     (skill) =>
       matchesClone(skill.clone, cloneFilter) &&
-      (skill.name.toLowerCase().includes(q) ||
-        skill.effect.toLowerCase().includes(q) ||
-        skill.category.toLowerCase().includes(q))
+      (normalizeMiningSearch(skill.name).includes(q) ||
+        normalizeMiningSearch(skill.effect).includes(q) ||
+        normalizeMiningSearch(skill.category).includes(q))
   ).length;
 
   const nullsecCount = NULLSEC_RULES.filter(
-    (rule) => rule.title.toLowerCase().includes(q) || rule.searchText.includes(q)
+    (rule) =>
+      normalizeMiningSearch(rule.title).includes(q) || normalizeMiningSearch(rule.searchText).includes(q)
   ).length;
 
   const specialtiesCount = SPECIALTIES_TOPICS.filter(
-    (spec) => spec.label.toLowerCase().includes(q) || spec.searchText.includes(q)
+    (spec) =>
+      normalizeMiningSearch(spec.label).includes(q) || normalizeMiningSearch(spec.searchText).includes(q)
   ).length;
 
   const fittingsCount = FITTINGS_LIST.filter(
     (fit) =>
       matchesClone(fit.clone, cloneFilter) &&
-      (fit.title.toLowerCase().includes(q) ||
-        fit.ship.toLowerCase().includes(q) ||
-        fit.environment.toLowerCase().includes(q) ||
-        fit.notes.toLowerCase().includes(q) ||
-        fit.eft.toLowerCase().includes(q))
+      (normalizeMiningSearch(fit.title).includes(q) ||
+        normalizeMiningSearch(fit.ship).includes(q) ||
+        normalizeMiningSearch(fit.environment).includes(q) ||
+        normalizeMiningSearch(fit.notes).includes(q) ||
+        normalizeMiningSearch(fit.eft).includes(q))
   ).length;
 
   return {

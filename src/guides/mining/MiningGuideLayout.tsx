@@ -6,6 +6,7 @@ import {
   MiningModuleGroup,
   MiningModuleId,
   ShipItem,
+  ShipMiniGuideId,
   SkillItem,
   VisualMode,
 } from '../../types';
@@ -38,6 +39,8 @@ interface MiningGuideLayoutProps {
   fittings: FittingItem[];
   shipTierFilter: string;
   onTierFilterChange: (tier: string) => void;
+  activeMiniGuide: ShipMiniGuideId | null;
+  onSelectMiniGuide: (guideId: ShipMiniGuideId | null, replace?: boolean) => void;
   specialtyTab: SpecialtyTab;
   onSpecialtyTabChange: (tab: SpecialtyTab) => void;
   copiedId: string | null;
@@ -67,6 +70,8 @@ export function MiningGuideLayout({
   fittings,
   shipTierFilter,
   onTierFilterChange,
+  activeMiniGuide,
+  onSelectMiniGuide,
   specialtyTab,
   onSpecialtyTabChange,
   copiedId,
@@ -259,9 +264,14 @@ export function MiningGuideLayout({
               ships={ships}
               shipTierFilter={shipTierFilter}
               onTierFilterChange={onTierFilterChange}
+              activeMiniGuide={activeMiniGuide}
+              onSelectMiniGuide={onSelectMiniGuide}
+              cloneFilter={cloneFilter}
+              searchQuery={searchQuery}
               visualMode={visualMode}
               onInspectShipFittings={onInspectShipFittings}
               onResetFilters={onResetFilters}
+              onResetSearch={onResetSearch}
             />
           )}
           {activeModule === 'skills' && (
